@@ -1,3 +1,4 @@
+import 'package:call_mechanic/ShowMap.dart';
 import 'package:call_mechanic/WelcomePage.dart';
 import 'package:flutter/material.dart';
 
@@ -100,17 +101,30 @@ class CustomerPageUI extends State<CustomerPage> {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 80,
-                    child: Image.asset('images/banner.png'),
-                  ),
-                  Expanded(
-                    flex: 20,
+                    flex: 35,
                     child: Text(
                       'Need A Mechanic?',
-                      textAlign: TextAlign.left,
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     ),
                   ),
+                  Expanded(
+                    flex: 65,
+                    child: Image.asset('images/banner.png'),
+                  ),
                 ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft, // Align the button to the left
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ShowMap()));
+                },
+                child: Text('Find One'),
+                style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.all(0), minimumSize: Size(75, 28)),
               ),
             ),
           ],

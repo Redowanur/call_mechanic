@@ -1,4 +1,3 @@
-import 'package:call_mechanic/ShowMap.dart';
 import 'package:call_mechanic/global/global.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -8,7 +7,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'LoginScreen.dart';
 import 'ForgotPassword.dart';
-
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -51,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
         await Fluttertoast.showToast(msg: "Successfully Registered");
         Navigator.push(
-            context, MaterialPageRoute(builder: (c) => ShowMap()));
+            context, MaterialPageRoute(builder: (c) => LoginScreen()));
       }).catchError((err) {
         Fluttertoast.showToast(msg: "Registration Failed");
       });
@@ -77,7 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   // Image.asset(
                   //     darkTheme ? "images/banner.png" : "images/spanner.png"),
                   SizedBox(
-                    height: 20,
+                    height: 40,
                   ),
                   Text(
                     "Register",
@@ -449,7 +447,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Text(
                                       "Have an account?  ",
                                       style: TextStyle(
-                                        color: Colors.black,
+                                        color: Colors.white,
                                         fontSize: 14,
                                       ),
                                     ),

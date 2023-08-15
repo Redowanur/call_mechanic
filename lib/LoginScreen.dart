@@ -1,9 +1,12 @@
-import 'package:call_mechanic/ShowMap.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+import 'MechanicPage.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../global/global.dart';
+import 'CustomerPage.dart';
 import 'RegisterScreen.dart';
 import 'ForgotPassword.dart';
 
@@ -18,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailtext = TextEditingController();
   final passwordtext = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String rolep = 'Mechanic';
   bool _passwordvis = false;
 
   void _submit() async {
@@ -34,8 +38,33 @@ class _LoginScreenState extends State<LoginScreen> {
         currentUser = auth.user;
 
         await Fluttertoast.showToast(msg: "Successfully Logged In");
-        Navigator.push(
-            context, MaterialPageRoute(builder: (c) => ShowMap()));
+
+        final ref = await FirebaseDatabase.instance
+            .ref()
+            .child('users')
+            .child(currentUser!.uid)
+            .get();
+
+        if (ref.exists) {
+          var bal = ref.value as Map;
+          rolep = bal['role'];
+        } else {
+          print('No data available.');
+        }
+
+        if (rolep == "User") {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (c) =>
+                      CustomerPage())); //replace with userprofile page
+        } else if (rolep == "Mechanic") {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (c) =>
+                      MechanicPage())); //replace with mechanicprofile page
+        }
       }).catchError((err) {
         Fluttertoast.showToast(msg: "Log In Failed");
       });
@@ -248,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Text(
                                       "Doesn't have an account?  ",
                                       style: TextStyle(
-                                        color: Colors.black,
+                                        color: Colors.white,
                                         fontSize: 14,
                                       ),
                                     ),

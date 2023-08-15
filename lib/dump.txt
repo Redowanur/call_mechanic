@@ -1,0 +1,28 @@
+Container(
+              padding: EdgeInsets.fromLTRB(20, 0, 0, 20),
+              child: Row(
+                children: [
+                  Text(
+                    'Online',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: darkTheme ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  SizedBox(
+                      width:
+                          0), // Add some space between the text and the switch
+                  Switch(
+                    value: isOnline,
+                    onChanged: (value) {
+                      setState(() {
+                        isOnline = value;
+                      });
+                    },
+                    activeColor: darkTheme
+                        ? Colors.amber.shade300
+                        : Colors.blue, // Change the active color
+                  ),
+                ],
+              ),
+            ),

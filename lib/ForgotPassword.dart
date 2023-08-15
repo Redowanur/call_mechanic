@@ -148,7 +148,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     Text(
                                       "Already have an account?  ",
                                       style: TextStyle(
-                                        color: Colors.black,
+                                        color: Colors.white,
                                         fontSize: 14,
                                       ),
                                     ),

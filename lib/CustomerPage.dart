@@ -20,8 +20,10 @@ myAlertDialog(context) {
           actions: [
             TextButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ForgotPassword()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ForgotPassword()));
                 },
                 child: Text('Yes')),
             TextButton(
@@ -41,7 +43,11 @@ class CustomerPageUI extends State<CustomerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("App Name"),
+        title: Text(
+          "App Name",
+          style: TextStyle(color: Colors.amber.shade400),
+        ),
+        backgroundColor: Colors.transparent,
       ),
       body: Container(
         padding: EdgeInsets.all(20),
@@ -73,15 +79,23 @@ class CustomerPageUI extends State<CustomerPage> {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ShowMap()));
                 },
-                child: Text('Find One'),
+                child: Text(
+                  'Find One',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(0), minimumSize: Size(75, 28)),
+                    padding: EdgeInsets.all(0),
+                    minimumSize: Size(90, 38),
+                    backgroundColor: Colors.amber.shade400),
               ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.amber.shade400,
         currentIndex: curIndex,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

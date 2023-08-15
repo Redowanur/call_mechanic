@@ -1,8 +1,14 @@
-import 'WelcomePage.dart';
+import 'package:call_mechanic/LoginScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 
-void main() {
+import 'themeprovider/theme_provider.dart';
+
+Future<void> main() async {
   runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 }
 
 class MyApp extends StatelessWidget {
@@ -10,11 +16,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Car Doctor',
-      home: WelcomePage(),
+      themeMode: ThemeMode.system,
+      theme: MyThemes.lighttheme,
+      darkTheme: MyThemes.darktheme,
+      home: LoginScreen(),
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.green,
-      ),
     );
   }
 }

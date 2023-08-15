@@ -1,5 +1,5 @@
 import 'package:call_mechanic/ShowMap.dart';
-import 'package:call_mechanic/WelcomePage.dart';
+import 'package:call_mechanic/ForgotPassword.dart';
 import 'package:flutter/material.dart';
 
 class CustomerPage extends StatefulWidget {
@@ -21,7 +21,7 @@ myAlertDialog(context) {
             TextButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => WelcomePage()));
+                      MaterialPageRoute(builder: (context) => ForgotPassword()));
                 },
                 child: Text('Yes')),
             TextButton(

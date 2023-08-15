@@ -35,62 +35,13 @@ myAlertDialog(context) {
 }
 
 class CustomerPageUI extends State<CustomerPage> {
+  int curIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("App Name"),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            DrawerHeader(
-              padding: EdgeInsets.all(0),
-              child: UserAccountsDrawerHeader(
-                // decoration: BoxDecoration(color: Colors.cyan),
-                accountName: Text('Redowanur Rahman'),
-                accountEmail: Text('rahmanlabibn74@gmail.com'),
-                currentAccountPicture: Image.network(
-                    'https://pluspng.com/img-png/user-png-icon-download-icons-logos-emojis-users-2240.png'),
-              ),
-            ),
-            ListTile(
-              title: Text('Home'),
-              leading: Icon(Icons.home),
-              onTap: () {
-                // mySnackBar('Home', context);
-              },
-            ),
-            ListTile(
-              title: Text('Contact'),
-              leading: Icon(Icons.contact_mail),
-              onTap: () {
-                // mySnackBar('Contact', context);
-              },
-            ),
-            ListTile(
-              title: Text('Profile'),
-              leading: Icon(Icons.person),
-              onTap: () {
-                // mySnackBar('Profile', context);
-              },
-            ),
-            ListTile(
-              title: Text('Locate Mechanic'),
-              leading: Icon(Icons.location_on),
-              onTap: () {
-                // mySnackBar('Email', context);
-              },
-            ),
-            ListTile(
-              title: Text('Log Out'),
-              leading: Icon(Icons.logout),
-              onTap: () {
-                myAlertDialog(context);
-              },
-            ),
-          ],
-        ),
       ),
       body: Container(
         padding: EdgeInsets.all(20),
@@ -129,6 +80,18 @@ class CustomerPageUI extends State<CustomerPage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: curIndex,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+        ],
+        onTap: (int index) {
+          setState(() {
+            curIndex = index;
+          });
+        },
       ),
     );
   }

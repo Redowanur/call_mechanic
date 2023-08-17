@@ -26,3 +26,45 @@ Container(
                 ],
               ),
             ),
+
+
+// rating 
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(5, (index) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _rating = index + 1;
+                });
+              },
+              child: Icon(
+                _rating > index ? Icons.star : Icons.star_border,
+                size: 40,
+                color: Colors.amber,
+              ),
+            );
+          }),
+        ),
+
+// list tile
+
+        ListTile(
+          title: Text('Settings'),
+          leading: Icon(
+            Icons.settings,
+            color: darkTheme ? Colors.amber.shade300 : Colors.blue,
+          ),
+          onTap: () {
+            // mySnackBar('Home', context);
+          },
+        ),
+        ListTile(
+          title: Text('Balance'),
+          leading: Icon(Icons.account_balance,
+              color: darkTheme ? Colors.amber.shade300 : Colors.blue),
+          onTap: () {
+            // mySnackBar('Contact', context);
+          },
+        ),

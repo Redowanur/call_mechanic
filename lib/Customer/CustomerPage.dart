@@ -2,10 +2,10 @@ import 'package:call_mechanic/ShowMap.dart';
 import 'package:call_mechanic/ForgotPassword.dart';
 import 'package:flutter/material.dart';
 
-class CustomerPage extends StatefulWidget {
+class Customer extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return CustomerPageUI();
+    return CustomerUI();
   }
 }
 
@@ -36,7 +36,7 @@ myAlertDialog(context) {
       });
 }
 
-class CustomerPageUI extends State<CustomerPage> {
+class CustomerUI extends State<Customer> {
   int curIndex = 0;
 
   @override

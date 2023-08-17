@@ -1,5 +1,4 @@
 import 'package:call_mechanic/LoginScreen.dart';
-import 'package:call_mechanic/MechanicPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
@@ -20,9 +19,8 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: MyThemes.lighttheme,
       darkTheme: MyThemes.darktheme,
-      home: MechanicPage(),
+      home: LoginScreen(),
       debugShowCheckedModeBanner: false,
-      
     );
   }
 }

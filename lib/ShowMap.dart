@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_info_window/custom_info_window.dart';
 
 class ShowMap extends StatefulWidget {
   @override
@@ -13,12 +15,36 @@ class ShowMap extends StatefulWidget {
 }
 
 class ShowMapUI extends State<ShowMap> {
+  CustomInfoWindowController _customInfoWindowController =
+      CustomInfoWindowController();
+
+  Set<Marker> markers = {};
   late GoogleMapController googleMapController;
 
-  static const LatLng sourceLocation = LatLng(37.33500926, -122.03272188);
+  @override
+  void dispose() {
+    googleMapController.dispose();
+    super.dispose();
+  }
+
+  static const LatLng sourceLocation = LatLng(24.897063, 91.869985);
   static const LatLng destination = LatLng(37.33429383, -122.06600055);
 
   List<LatLng> polylineCoordinates = [];
+
+  Future<List<Map<String, dynamic>>> fetchOnlineUsers() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+
+    List<Map<String, dynamic>> users = querySnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+
+    List<Map<String, dynamic>> onlineUsers =
+        users.where((user) => user['isOnline'] == true).toList();
+
+    return onlineUsers;
+  }
 
   void getPolyPoints() async {
     PolylinePoints polylinePoints = PolylinePoints();
@@ -38,31 +64,48 @@ class ShowMapUI extends State<ShowMap> {
     }
   }
 
+  @override
   void initState() {
-    getPolyPoints();
     super.initState();
+    getPolyPoints();
+    fetchAndDisplayOnlineUsers();
   }
 
-  Set<Marker> markers = {
-    const Marker(
-      markerId: MarkerId('source'),
-      position: sourceLocation,
-    ),
-    const Marker(
-      markerId: MarkerId('destination'),
-      position: destination,
-    ),
-  };
+  Widget _buildInfoWindowContent(Map<String, dynamic> user) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text('User Info', style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        Text('Name: ${user['name']}'),
+        Text('Phone: ${user['phone']}'),
+        Text('Rating: ${user['rating']}'),
+      ],
+    );
+  }
+
+  Future<void> fetchAndDisplayOnlineUsers() async {
+    List<Map<String, dynamic>> onlineUsers = await fetchOnlineUsers();
+
+    setState(() {
+      markers.addAll(onlineUsers.map((user) {
+        GeoPoint location = user['location'] as GeoPoint;
+        // print(user['location']);
+        return Marker(
+          markerId: MarkerId(user['id']), // Replace with a unique ID
+          position: LatLng(location.latitude, location.longitude),
+        );
+      }));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Example: Changing the marker color to red
+    BitmapDescriptor customMarker =
+        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Nearby Mechanics',
-          style: TextStyle(color: Colors.black, fontSize: 16),
-        ),
-      ),
       body: GoogleMap(
         initialCameraPosition:
             CameraPosition(target: sourceLocation, zoom: 13.5),
@@ -82,6 +125,7 @@ class ShowMapUI extends State<ShowMap> {
         zoomControlsEnabled: false,
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue,
         onPressed: () async {
           Position position = await _determinePosition();
           googleMapController.animateCamera(CameraUpdate.newCameraPosition(
@@ -89,12 +133,12 @@ class ShowMapUI extends State<ShowMap> {
                   target: LatLng(position.latitude, position.longitude),
                   zoom: 14)));
 
-          markers.clear();
-          markers.add(Marker(markerId: const MarkerId('currentLocation'), position: LatLng(position.latitude, position.longitude)));
+          markers.add(Marker(
+              markerId: const MarkerId('currentLocation'),
+              position: LatLng(position.latitude, position.longitude),
+              icon: customMarker));
 
-          setState(() {
-            
-          });
+          setState(() {});
         },
         child: Icon(Icons.my_location),
       ),
@@ -128,5 +172,9 @@ class ShowMapUI extends State<ShowMap> {
     Position position = await Geolocator.getCurrentPosition();
 
     return position;
+  }
+
+  foo() {
+    print('objection your honor');
   }
 }

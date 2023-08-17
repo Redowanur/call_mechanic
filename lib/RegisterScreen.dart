@@ -1,12 +1,14 @@
 import 'package:call_mechanic/global/global.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'LoginScreen.dart';
+
 import 'ForgotPassword.dart';
+import 'LoginScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -22,12 +24,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final adresstext = TextEditingController();
   final passwordtext = TextEditingController();
   final confimtext = TextEditingController();
-
+  String defrole = 'Select Role';
   bool _passwordvis = false;
 
   final _formKey = GlobalKey<FormState>();
 
   void _submit() async {
+    print(defrole);
     if (_formKey.currentState!.validate() == false) {
       await firebaseAuth
           .createUserWithEmailAndPassword(
@@ -35,14 +38,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           .then((auth) async {
         currentUser = auth.user;
         if (currentUser != null) {
+          
           Map userMap = {
             'id': currentUser!.uid,
             'name': nametext.text.trim(),
             'email': emailtext.text.trim(),
             'address': adresstext.text.trim(),
             'phone': phonetext.text.trim(),
-            'password': passwordtext.text.trim()
+            'role': defrole,
           };
+          // print(userMap);
           DatabaseReference userRef =
               FirebaseDatabase.instance.ref().child('users');
           userRef.child(currentUser!.uid).set(userMap);
@@ -393,6 +398,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   }),
                                 ),
                                 SizedBox(
+                                  height: 20,
+                                ),
+                                DropdownButtonFormField<String>(
+                                  value: defrole,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      defrole = newValue!;
+                                    });
+                                  },
+                                  items: <String>[
+                                    'Select Role',
+                                    'Mechanic',
+                                    'User'
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.person,
+                                            color: darkTheme
+                                                ? Colors.amber.shade400
+                                                : Colors.grey,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(value),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                  decoration: InputDecoration(
+                                    hintText: "Select Role",
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey,
+                                    ),
+                                    filled: true,
+                                    fillColor: darkTheme
+                                        ? Colors.black45
+                                        : Colors.grey.shade200,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(40),
+                                      borderSide: BorderSide(
+                                        width: 0,
+                                        style: BorderStyle.none,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
                                   height: 50,
                                 ),
                                 ElevatedButton(
@@ -447,7 +502,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Text(
                                       "Have an account?  ",
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.black,
                                         fontSize: 14,
                                       ),
                                     ),

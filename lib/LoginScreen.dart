@@ -1,12 +1,12 @@
 import 'package:firebase_database/firebase_database.dart';
 
-import 'MechanicPage.dart';
+import 'Mechanic/Mechanic.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../global/global.dart';
-import 'CustomerPage.dart';
+import 'Customer/CustomerPage.dart';
 import 'RegisterScreen.dart';
 import 'ForgotPassword.dart';
 
@@ -57,13 +57,13 @@ class _LoginScreenState extends State<LoginScreen> {
               context,
               MaterialPageRoute(
                   builder: (c) =>
-                      CustomerPage())); //replace with userprofile page
+                      Customer())); //replace with userprofile page
         } else if (rolep == "Mechanic") {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (c) =>
-                      MechanicPage())); //replace with mechanicprofile page
+                      Mechanic())); //replace with mechanicprofile page
         }
       }).catchError((err) {
         Fluttertoast.showToast(msg: "Log In Failed");

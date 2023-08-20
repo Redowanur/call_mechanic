@@ -1,34 +1,83 @@
+import 'package:call_mechanic/LoginScreen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MechanicProfile extends StatefulWidget {
+  String id, name;
+  MechanicProfile(this.id, this.name);
+
   @override
   State<StatefulWidget> createState() {
-    return MechanicProfileUI();
+    return MechanicProfileUI(id, name);
   }
 }
 
 class MechanicProfileUI extends State<MechanicProfile> {
-  int _rating = 0;
+  String id, name;
   bool isOnline = true;
+
+  MechanicProfileUI(this.id, this.name);
+
+  final ref = FirebaseDatabase.instance.ref('users');
 
   @override
   Widget build(BuildContext context) {
     bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
+    myAlertDialog(context) {
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Expanded(
+                child: AlertDialog(
+              // title: Text('Alert !'),
+              content: Text('Do you want to Log out?'),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (c) => LoginScreen()));
+                      Fluttertoast.showToast(msg: "Logged out");
+                    },
+                    child: Text(
+                      'Yes',
+                      style: TextStyle(
+                        fontFamily: 'UberMove',
+                        color: darkTheme ? Colors.amber.shade300 : Colors.blue,
+                      ),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'No',
+                      style: TextStyle(
+                        fontFamily: 'UberMove',
+                        color: darkTheme ? Colors.amber.shade300 : Colors.blue,
+                      ),
+                    )),
+              ],
+            ));
+          });
+    }
+
     return Container(
-      padding: EdgeInsets.all(0),
+      padding: const EdgeInsets.all(0),
       child: Column(children: [
         // 1st children
         Container(
           // alignment: Alignment.topLeft,
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               Expanded(
                   flex: 80,
                   child: Text(
-                    'Redowanur Rahman',
+                    name,
                     style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
@@ -36,7 +85,7 @@ class MechanicProfileUI extends State<MechanicProfile> {
                       color: darkTheme ? Colors.amber.shade300 : Colors.blue,
                     ),
                   )),
-              Expanded(
+              const Expanded(
                   flex: 20,
                   child: Icon(
                     Icons.person,
@@ -47,8 +96,8 @@ class MechanicProfileUI extends State<MechanicProfile> {
         ),
         // 2nd children
         Container(
-          padding: EdgeInsets.all(20),
-          child: Row(
+          padding: const EdgeInsets.all(20),
+          child: const Row(
             children: [
               Icon(
                 Icons.star,
@@ -65,7 +114,7 @@ class MechanicProfileUI extends State<MechanicProfile> {
           ),
         ),
         Container(
-          padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
           child: Row(
             children: [
               Text(
@@ -76,13 +125,18 @@ class MechanicProfileUI extends State<MechanicProfile> {
                   color: darkTheme ? Colors.white : Colors.black,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                   width: 0), // Add some space between the text and the switch
               Switch(
                 value: isOnline,
                 onChanged: (value) {
                   setState(() {
                     isOnline = value;
+                    if (isOnline) {
+                      ref.child(id).update({'isOnline': true});
+                    } else {
+                      ref.child(id).update({'isOnline': false});
+                    }
                   });
                 },
                 activeColor: darkTheme
@@ -93,7 +147,7 @@ class MechanicProfileUI extends State<MechanicProfile> {
           ),
         ),
         Container(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 15),
           child: Row(
             children: [
               Expanded(
@@ -200,16 +254,34 @@ class MechanicProfileUI extends State<MechanicProfile> {
             ],
           ),
         ),
-
-        // Container(
-        //   height: 8,
-        //   color: darkTheme
-        //       ? Color.fromRGBO(112, 112, 112, 1)
-        //       : Color.fromRGBO(236, 235, 235, 1),
-        // ),
-        // SizedBox(
-        //   height: 15,
-        // ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          height: 6,
+          color: darkTheme
+              ? Color.fromRGBO(112, 112, 112, 1)
+              : Color.fromRGBO(236, 235, 235, 1),
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        ListTile(
+          title: Text('Settings'),
+          leading: Icon(Icons.settings),
+          onTap: () {
+            // mySnackBar('Home', context);
+          },
+          iconColor: darkTheme ? Colors.amber.shade300 : Colors.blue,
+        ),
+        ListTile(
+          title: Text('Log out'),
+          leading: Icon(Icons.logout),
+          onTap: () {
+            myAlertDialog(context);
+          },
+          iconColor: darkTheme ? Colors.amber.shade300 : Colors.blue,
+        ),
       ]),
     );
   }

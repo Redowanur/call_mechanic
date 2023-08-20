@@ -50,7 +50,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     style: TextStyle(
                         color: darkTheme ? Colors.amber.shade300 : Colors.blue,
                         fontSize: 25,
-                        fontWeight: FontWeight.bold),
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'UberMove'),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(15, 50, 15, 180),
@@ -73,8 +74,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   decoration: InputDecoration(
                                       hintText: "email",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -134,9 +135,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   child: Text(
                                     "Send Link via Email",
                                     style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'UberMove'),
                                   ),
                                 ),
                                 SizedBox(
@@ -148,9 +149,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     Text(
                                       "Already have an account?  ",
                                       style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                      ),
+                                          color: darkTheme
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontSize: 14,
+                                          fontFamily: 'UberMove'),
                                     ),
                                     SizedBox(
                                       height: 5,
@@ -165,11 +168,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       child: Text(
                                         "Sign In",
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          color: darkTheme
-                                              ? Colors.amber.shade400
-                                              : Colors.blue,
-                                        ),
+                                            fontSize: 14,
+                                            color: darkTheme
+                                                ? Colors.amber.shade400
+                                                : Colors.blue,
+                                            fontFamily: 'UberMove'),
                                       ),
                                     )
                                   ],

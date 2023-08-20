@@ -1,6 +1,5 @@
 import 'package:call_mechanic/global/global.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +24,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final passwordtext = TextEditingController();
   final confimtext = TextEditingController();
   String defrole = 'Select Role';
+  bool isOnline = true;
+  double latitude = 0, longitude = 0, rating = 0;
+
   bool _passwordvis = false;
 
   final _formKey = GlobalKey<FormState>();
@@ -37,8 +39,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               email: emailtext.text.trim(), password: passwordtext.text.trim())
           .then((auth) async {
         currentUser = auth.user;
-        if (currentUser != null) {
-          
+
+        if (defrole == 'User') {
+          // Insert user-specific fields (latitude, longitude) here
+          DatabaseReference userRef =
+              FirebaseDatabase.instance.ref().child('users');
           Map userMap = {
             'id': currentUser!.uid,
             'name': nametext.text.trim(),
@@ -46,12 +51,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'address': adresstext.text.trim(),
             'phone': phonetext.text.trim(),
             'role': defrole,
+            'latitude': latitude,
+            'longitude': longitude,
           };
-          // print(userMap);
+          userRef.child(currentUser!.uid).set(userMap);
+        } else if (defrole == 'Mechanic') {
+          // Insert mechanic-specific fields (isOnline, latitude, longitude, rating) here
           DatabaseReference userRef =
               FirebaseDatabase.instance.ref().child('users');
+          Map userMap = {
+            'id': currentUser!.uid,
+            'name': nametext.text.trim(),
+            'email': emailtext.text.trim(),
+            'address': adresstext.text.trim(),
+            'phone': phonetext.text.trim(),
+            'role': defrole,
+            'isOnline': isOnline,
+            'latitude': latitude,
+            'longitude': longitude,
+            'rating': rating,
+          };
           userRef.child(currentUser!.uid).set(userMap);
         }
+
         await Fluttertoast.showToast(msg: "Successfully Registered");
         Navigator.push(
             context, MaterialPageRoute(builder: (c) => LoginScreen()));
@@ -87,7 +109,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(
                         color: darkTheme ? Colors.amber.shade300 : Colors.blue,
                         fontSize: 25,
-                        fontWeight: FontWeight.bold),
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'UberMove'),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
@@ -107,8 +130,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   decoration: InputDecoration(
                                       hintText: "name",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -153,8 +176,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   decoration: InputDecoration(
                                       hintText: "email",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -206,8 +229,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   decoration: InputDecoration(
                                     hintText: "phone",
                                     hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                    ),
+                                        color: Colors.grey,
+                                        fontFamily: 'UberMove'),
                                     filled: true,
                                     fillColor: darkTheme
                                         ? Colors.black45
@@ -229,8 +252,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   decoration: InputDecoration(
                                       hintText: "address",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -276,8 +299,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   decoration: InputDecoration(
                                       hintText: "password",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -339,8 +362,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   decoration: InputDecoration(
                                       hintText: "confirm password",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -469,9 +492,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   child: Text(
                                     "Register",
                                     style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'UberMove'),
                                   ),
                                 ),
                                 SizedBox(
@@ -487,10 +510,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   child: Text(
                                     "Forgot Password",
                                     style: TextStyle(
-                                      color: darkTheme
-                                          ? Colors.amber.shade400
-                                          : Colors.blue,
-                                    ),
+                                        fontSize: 14,
+                                        color: darkTheme
+                                            ? Colors.amber.shade400
+                                            : Colors.blue,
+                                        fontFamily: 'UberMove'),
                                   ),
                                 ),
                                 SizedBox(
@@ -502,9 +526,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Text(
                                       "Have an account?  ",
                                       style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                      ),
+                                          color: darkTheme
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontSize: 14,
+                                          fontFamily: 'UberMove'),
                                     ),
                                     SizedBox(
                                       height: 5,
@@ -519,11 +545,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       child: Text(
                                         "Sign In",
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          color: darkTheme
-                                              ? Colors.amber.shade400
-                                              : Colors.blue,
-                                        ),
+                                            fontSize: 14,
+                                            color: darkTheme
+                                                ? Colors.amber.shade400
+                                                : Colors.blue,
+                                            fontFamily: 'UberMove'),
                                       ),
                                     )
                                   ],

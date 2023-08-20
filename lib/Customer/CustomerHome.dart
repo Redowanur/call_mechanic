@@ -1,11 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:call_mechanic/ShowMap.dart';
 import 'package:call_mechanic/ForgotPassword.dart';
-import 'package:flutter/material.dart';
 
-class Customer extends StatefulWidget {
+class CustomerHome extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return CustomerUI();
+    return CustomerHomeUI();
   }
 }
 
@@ -36,19 +36,12 @@ myAlertDialog(context) {
       });
 }
 
-class CustomerUI extends State<Customer> {
+class CustomerHomeUI extends State<CustomerHome> {
   int curIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "App Name",
-          style: TextStyle(color: Colors.amber.shade400),
-        ),
-        backgroundColor: Colors.transparent,
-      ),
       body: Container(
         padding: EdgeInsets.all(20),
         child: Column(

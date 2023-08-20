@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../global/global.dart';
-import 'Customer/CustomerPage.dart';
+import 'Customer/Customer.dart';
 import 'RegisterScreen.dart';
 import 'ForgotPassword.dart';
 
@@ -21,7 +21,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailtext = TextEditingController();
   final passwordtext = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String rolep = 'Mechanic';
+  String rolep = '';
+  String id = '';
+  String name = '';
+  double rating = 0.0;
   bool _passwordvis = false;
 
   void _submit() async {
@@ -48,6 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
         if (ref.exists) {
           var bal = ref.value as Map;
           rolep = bal['role'];
+          id = bal['id'];
+          name = bal['name'];
+          if (rolep == "Mechanic") rating = bal['rating'];
         } else {
           print('No data available.');
         }
@@ -57,13 +63,13 @@ class _LoginScreenState extends State<LoginScreen> {
               context,
               MaterialPageRoute(
                   builder: (c) =>
-                      Customer())); //replace with userprofile page
+                      Customer(id, name))); //replace with userprofile page
         } else if (rolep == "Mechanic") {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (c) =>
-                      Mechanic())); //replace with mechanicprofile page
+                      Mechanic(id, name))); //replace with mechanicprofile page
         }
       }).catchError((err) {
         Fluttertoast.showToast(msg: "Log In Failed");
@@ -97,7 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                         color: darkTheme ? Colors.amber.shade300 : Colors.blue,
                         fontSize: 25,
-                        fontWeight: FontWeight.bold),
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'UberMove'),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(15, 50, 15, 180),
@@ -120,8 +127,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: InputDecoration(
                                       hintText: "email",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -170,8 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: InputDecoration(
                                       hintText: "password",
                                       hintStyle: TextStyle(
-                                        color: Colors.grey,
-                                      ),
+                                          color: Colors.grey,
+                                          fontFamily: 'UberMove'),
                                       filled: true,
                                       fillColor: darkTheme
                                           ? Colors.black45
@@ -244,9 +251,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Text(
                                     "Log In",
                                     style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'UberMove'),
                                   ),
                                 ),
                                 SizedBox(
@@ -262,10 +269,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Text(
                                     "Forgot Password",
                                     style: TextStyle(
-                                      color: darkTheme
-                                          ? Colors.amber.shade400
-                                          : Colors.blue,
-                                    ),
+                                        fontSize: 14,
+                                        color: darkTheme
+                                            ? Colors.amber.shade400
+                                            : Colors.blue,
+                                        fontFamily: 'UberMove'),
                                   ),
                                 ),
                                 SizedBox(
@@ -277,9 +285,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Text(
                                       "Doesn't have an account?  ",
                                       style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                      ),
+                                          color: darkTheme
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontSize: 14,
+                                          fontFamily: 'UberMove'),
                                     ),
                                     SizedBox(
                                       height: 5,
@@ -295,11 +305,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: Text(
                                         "Register",
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          color: darkTheme
-                                              ? Colors.amber.shade400
-                                              : Colors.blue,
-                                        ),
+                                            fontSize: 14,
+                                            color: darkTheme
+                                                ? Colors.amber.shade400
+                                                : Colors.blue,
+                                            fontFamily: 'UberMove'),
                                       ),
                                     )
                                   ],

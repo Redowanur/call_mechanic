@@ -1,39 +1,33 @@
-import 'package:call_mechanic/Mechanic/MechanicProfile.dart';
-import 'package:call_mechanic/Mechanic/MechanicSettings.dart';
-import 'package:call_mechanic/ShowMap.dart';
 import 'package:flutter/material.dart';
+import 'CustomerHome.dart';
 import 'package:flutter/services.dart';
+import 'CustomerProfile.dart';
 
-import 'MechanicHome.dart';
-
-// ignore: must_be_immutable
-class Mechanic extends StatefulWidget {
+class Customer extends StatefulWidget {
   String id, name;
-  Mechanic(this.id, this.name, {super.key});
+  Customer(this.id, this.name, {super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return MechanicUI(id, name);
+    return CustomerUI(id, name);
   }
 }
 
-class MechanicUI extends State<Mechanic> {
+class CustomerUI extends State<Customer> {
   String id, name;
   int curIndex = 0;
 
-  MechanicUI(this.id, this.name);
+  CustomerUI(this.id, this.name);
+
+  List pages = [
+    CustomerHome(),
+    CustomerProfile(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
-
-    List pages = [
-      MechanicHome(),
-      ShowMap(),
-      MechanicProfile(id, name),
-      MechanicSettings(),
-    ];
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: darkTheme
@@ -56,8 +50,6 @@ class MechanicUI extends State<Mechanic> {
           showUnselectedLabels: false,
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.location_pin), label: 'Map'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
           ],
           onTap: (int index) {

@@ -1,3 +1,4 @@
+import 'package:call_mechanic/Mechanic/MechanicMap.dart';
 import 'package:call_mechanic/Mechanic/MechanicProfile.dart';
 import 'package:call_mechanic/Mechanic/MechanicSettings.dart';
 import 'package:call_mechanic/ShowMap.dart';
@@ -30,7 +31,7 @@ class MechanicUI extends State<Mechanic> {
 
     List pages = [
       MechanicHome(),
-      ShowMap(),
+      MechanicMap(),
       MechanicProfile(id, name),
       // MechanicSettings(),
     ];

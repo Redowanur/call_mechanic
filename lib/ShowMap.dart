@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
@@ -66,34 +64,104 @@ class ShowMapUI extends State<ShowMap> {
   void initState() {
     super.initState();
     getPolyPoints();
-    fetchAndDisplayOnlineUsers();
+    fetchAndDisplayOnlineMechanics();
   }
 
-  Widget _buildInfoWindowContent(Map<String, dynamic> user) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text('User Info', style: TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(height: 8),
-        Text('Name: ${user['name']}'),
-        Text('Phone: ${user['phone']}'),
-        Text('Rating: ${user['rating']}'),
-      ],
-    );
+  TextStyle infoStyle() {
+    return TextStyle(
+        fontFamily: 'UberMove', color: Color.fromRGBO(0, 103, 204, 1));
   }
 
-  Future<void> fetchAndDisplayOnlineUsers() async {
-    List<Map<String, dynamic>> onlineUsers = await fetchOnlineMechanics();
+  Future _displayMechanicInfo(BuildContext context, String name, String phone,
+      String address, String rating) {
+    return showModalBottomSheet(
+        context: context,
+        backgroundColor: Color.fromRGBO(200, 235, 235, 1),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+        builder: (context) => Container(
+              height: 500,
+              child: ListView(
+                children: [
+                  // DrawerHeader(
+                  //   padding: EdgeInsets.all(0),
+                  //   child: UserAccountsDrawerHeader(
+                  //     // decoration: BoxDecoration(color: Colors.cyan),
+                  //     accountName: Text('Redowanur Rahman'),
+                  //     accountEmail: Text('rahmanlabibn74@gmail.com'),
+                  //     currentAccountPicture: Image.network(
+                  //         'https://pluspng.com/img-png/user-png-icon-download-icons-logos-emojis-users-2240.png'),
+                  //   ),
+                  // ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  ListTile(
+                    title: Text(
+                      name,
+                      style: infoStyle(),
+                    ),
+                    leading: Icon(
+                      Icons.person,
+                      color: Color.fromRGBO(0, 103, 204, 1),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      phone,
+                      style: infoStyle(),
+                    ),
+                    leading: Icon(
+                      Icons.phone,
+                      color: Color.fromRGBO(0, 103, 204, 1),
+                    ),
+                    onTap: () {
+                      // mySnackBar('Contact', context);
+                    },
+                  ),
+                  ListTile(
+                    title: Text(
+                      address,
+                      style: infoStyle(),
+                    ),
+                    leading: Icon(
+                      Icons.location_on_outlined,
+                      color: Color.fromRGBO(0, 103, 204, 1),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      rating,
+                      style: infoStyle(),
+                    ),
+                    leading: Icon(
+                      Icons.reviews,
+                      color: Color.fromRGBO(0, 103, 204, 1),
+                    ),
+                  ),
+                  Center(
+                    child: ElevatedButton(onPressed: () {}, child: Text('ggg')),
+                  )
+                ],
+              ),
+            ));
+  }
+
+  Future<void> fetchAndDisplayOnlineMechanics() async {
+    List<Map<String, dynamic>> onlineMechanics = await fetchOnlineMechanics();
 
     setState(() {
-      markers.addAll(onlineUsers.map((user) {
+      markers.addAll(onlineMechanics.map((user) {
         double latitude = user['latitude'] as double;
         double longitude = user['longitude'] as double;
 
         return Marker(
-          markerId: MarkerId(user['id']), // Replace with a unique ID
-          position: LatLng(latitude, longitude),
-        );
+            markerId: MarkerId(user['id']), // Replace with a unique ID
+            position: LatLng(latitude, longitude),
+            onTap: () {
+              _displayMechanicInfo(context, user['name'], user['phone'],
+                  user['address'], user['rating'].toString());
+            });
       }));
     });
   }

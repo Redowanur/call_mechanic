@@ -47,7 +47,6 @@ class MechanicHomeUI extends State<MechanicHome> {
               actions: [
                 TextButton(
                     onPressed: () {
-                      
                       Navigator.of(context).pop();
                       Fluttertoast.showToast(msg: "Accepted Request");
                     },
@@ -112,14 +111,6 @@ class MechanicHomeUI extends State<MechanicHome> {
                         : Color.fromRGBO(236, 235, 235, 1),
                     borderRadius: BorderRadius.circular(
                         10), // Adjust the radius as needed
-                    // boxShadow: [
-                    //   BoxShadow(
-                    //     color: Colors.grey.withOpacity(0.5),
-                    //     spreadRadius: 2,
-                    //     blurRadius: 5,
-                    //     offset: Offset(0, 3),
-                    //   ),
-                    // ],
                   ),
                   child: ListTile(
                     onTap: () {

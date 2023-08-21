@@ -29,7 +29,7 @@ class ShowMapUI extends State<ShowMap> {
 
   List<LatLng> polylineCoordinates = [];
 
-  Future<List<Map<String, dynamic>>> fetchOnlineUsers() async {
+  Future<List<Map<String, dynamic>>> fetchOnlineMechanics() async {
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('users').get();
 
@@ -37,10 +37,11 @@ class ShowMapUI extends State<ShowMap> {
         .map((doc) => doc.data() as Map<String, dynamic>)
         .toList();
 
-    List<Map<String, dynamic>> onlineUsers =
-        users.where((user) => user['isOnline'] == true).toList();
+    List<Map<String, dynamic>> onlineMechanics = users
+        .where((user) => user['role'] == 'Mechanic' && user['isOnline'] == true)
+        .toList();
 
-    return onlineUsers;
+    return onlineMechanics;
   }
 
   void getPolyPoints() async {
@@ -82,15 +83,16 @@ class ShowMapUI extends State<ShowMap> {
   }
 
   Future<void> fetchAndDisplayOnlineUsers() async {
-    List<Map<String, dynamic>> onlineUsers = await fetchOnlineUsers();
+    List<Map<String, dynamic>> onlineUsers = await fetchOnlineMechanics();
 
     setState(() {
       markers.addAll(onlineUsers.map((user) {
-        GeoPoint location = user['location'] as GeoPoint;
-        // print(user['location']);
+        double latitude = user['latitude'] as double;
+        double longitude = user['longitude'] as double;
+
         return Marker(
           markerId: MarkerId(user['id']), // Replace with a unique ID
-          position: LatLng(location.latitude, location.longitude),
+          position: LatLng(latitude, longitude),
         );
       }));
     });

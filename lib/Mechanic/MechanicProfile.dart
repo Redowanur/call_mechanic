@@ -1,5 +1,5 @@
 import 'package:call_mechanic/LoginScreen.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
@@ -22,7 +22,7 @@ class MechanicProfileUI extends State<MechanicProfile> {
 
   MechanicProfileUI(this.id, this.name);
 
-  final ref = FirebaseDatabase.instance.ref('users');
+  final userDocRef = FirebaseFirestore.instance.collection('users');
 
   @override
   Widget build(BuildContext context) {
@@ -132,12 +132,12 @@ class MechanicProfileUI extends State<MechanicProfile> {
                   width: 0), // Add some space between the text and the switch
               Switch(
                 value: isOnline,
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() async {
                     isOnline = value;
                     if (isOnline) {
                       Position position = await _determinePosition();
-                      ref.child(id).update({
+                      await userDocRef.doc(id).update({
                         'isOnline': true,
                         'latitude': position.latitude,
                         'longitude': position.longitude,
@@ -145,7 +145,7 @@ class MechanicProfileUI extends State<MechanicProfile> {
 
                       setState(() {});
                     } else {
-                      ref.child(id).update({
+                      await userDocRef.doc(id).update({
                         'isOnline': false,
                         'latitude': 0.0,
                         'longitude': 0.0,

@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:custom_info_window/custom_info_window.dart';
 
 class ShowMap extends StatefulWidget {
   @override
@@ -15,9 +15,6 @@ class ShowMap extends StatefulWidget {
 }
 
 class ShowMapUI extends State<ShowMap> {
-  CustomInfoWindowController _customInfoWindowController =
-      CustomInfoWindowController();
-
   Set<Marker> markers = {};
   late GoogleMapController googleMapController;
 
@@ -172,9 +169,5 @@ class ShowMapUI extends State<ShowMap> {
     Position position = await Geolocator.getCurrentPosition();
 
     return position;
-  }
-
-  foo() {
-    print('objection your honor');
   }
 }

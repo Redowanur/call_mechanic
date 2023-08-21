@@ -32,7 +32,7 @@ class MechanicUI extends State<Mechanic> {
       MechanicHome(),
       ShowMap(),
       MechanicProfile(id, name),
-      MechanicSettings(),
+      // MechanicSettings(),
     ];
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

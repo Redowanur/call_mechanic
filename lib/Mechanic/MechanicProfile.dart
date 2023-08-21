@@ -2,6 +2,8 @@ import 'package:call_mechanic/LoginScreen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MechanicProfile extends StatefulWidget {
   String id, name;
@@ -16,6 +18,7 @@ class MechanicProfile extends StatefulWidget {
 class MechanicProfileUI extends State<MechanicProfile> {
   String id, name;
   bool isOnline = true;
+  late GoogleMapController googleMapController;
 
   MechanicProfileUI(this.id, this.name);
 
@@ -130,12 +133,25 @@ class MechanicProfileUI extends State<MechanicProfile> {
               Switch(
                 value: isOnline,
                 onChanged: (value) {
-                  setState(() {
+                  setState(() async {
                     isOnline = value;
                     if (isOnline) {
-                      ref.child(id).update({'isOnline': true});
+                      Position position = await _determinePosition();
+                      ref.child(id).update({
+                        'isOnline': true,
+                        'latitude': position.latitude,
+                        'longitude': position.longitude,
+                      });
+
+                      setState(() {});
                     } else {
-                      ref.child(id).update({'isOnline': false});
+                      ref.child(id).update({
+                        'isOnline': false,
+                        'latitude': 0.0,
+                        'longitude': 0.0,
+                      });
+
+                      setState(() {});
                     }
                   });
                 },
@@ -284,5 +300,34 @@ class MechanicProfileUI extends State<MechanicProfile> {
         ),
       ]),
     );
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permission denied.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+
+    return position;
   }
 }

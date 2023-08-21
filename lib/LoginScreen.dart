@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import 'Mechanic/Mechanic.dart';
@@ -34,26 +36,27 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       print("Inside if condition");
 
-      await firebaseAuth
-          .signInWithEmailAndPassword(
-              email: emailtext.text.trim(), password: passwordtext.text.trim())
-          .then((auth) async {
-        currentUser = auth.user;
+      try {
+        final authResult =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailtext.text.trim(),
+          password: passwordtext.text.trim(),
+        );
+        final currentUser = authResult.user;
 
         await Fluttertoast.showToast(msg: "Successfully Logged In");
 
-        final ref = await FirebaseDatabase.instance
-            .ref()
-            .child('users')
-            .child(currentUser!.uid)
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser!.uid)
             .get();
 
-        if (ref.exists) {
-          var bal = ref.value as Map;
-          rolep = bal['role'];
-          id = bal['id'];
-          name = bal['name'];
-          if (rolep == "Mechanic") rating = bal['rating'];
+        if (userDoc.exists) {
+          var userData = userDoc.data() as Map<String, dynamic>;
+          rolep = userData['role'];
+          id = userData['id'];
+          name = userData['name'];
+          // if (rolep == "Mechanic") rating = userData['rating'];
         } else {
           print('No data available.');
         }
@@ -63,17 +66,17 @@ class _LoginScreenState extends State<LoginScreen> {
               context,
               MaterialPageRoute(
                   builder: (c) =>
-                      Customer(id, name))); //replace with userprofile page
+                      Customer(id, name))); // replace with user profile page
         } else if (rolep == "Mechanic") {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (c) =>
-                      Mechanic(id, name))); //replace with mechanicprofile page
+                  builder: (c) => Mechanic(
+                      id, name))); // replace with mechanic profile page
         }
-      }).catchError((err) {
+      } catch (error) {
         Fluttertoast.showToast(msg: "Log In Failed");
-      });
+      }
     } else {
       Fluttertoast.showToast(msg: "Something went wrong!!");
     }

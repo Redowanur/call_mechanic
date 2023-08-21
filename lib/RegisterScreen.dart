@@ -1,6 +1,8 @@
-import 'package:call_mechanic/global/global.dart';
+// import 'package:call_mechanic/global/global.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -34,18 +36,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _submit() async {
     print(defrole);
     if (_formKey.currentState!.validate() == false) {
-      await firebaseAuth
-          .createUserWithEmailAndPassword(
-              email: emailtext.text.trim(), password: passwordtext.text.trim())
-          .then((auth) async {
-        currentUser = auth.user;
+      try {
+        final authResult =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailtext.text.trim(),
+          password: passwordtext.text.trim(),
+        );
+        final currentUser = authResult.user;
+
+        final userRef = FirebaseFirestore.instance.collection('users');
 
         if (defrole == 'User') {
-          // Insert user-specific fields (latitude, longitude) here
-          DatabaseReference userRef =
-              FirebaseDatabase.instance.ref().child('users');
-          Map userMap = {
-            'id': currentUser!.uid,
+          await userRef.doc(currentUser!.uid).set({
+            'id': currentUser.uid,
             'name': nametext.text.trim(),
             'email': emailtext.text.trim(),
             'address': adresstext.text.trim(),
@@ -53,14 +56,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'role': defrole,
             'latitude': latitude,
             'longitude': longitude,
-          };
-          userRef.child(currentUser!.uid).set(userMap);
+          });
         } else if (defrole == 'Mechanic') {
-          // Insert mechanic-specific fields (isOnline, latitude, longitude, rating) here
-          DatabaseReference userRef =
-              FirebaseDatabase.instance.ref().child('users');
-          Map userMap = {
-            'id': currentUser!.uid,
+          await userRef.doc(currentUser!.uid).set({
+            'id': currentUser.uid,
             'name': nametext.text.trim(),
             'email': emailtext.text.trim(),
             'address': adresstext.text.trim(),
@@ -70,16 +69,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'latitude': latitude,
             'longitude': longitude,
             'rating': rating,
-          };
-          userRef.child(currentUser!.uid).set(userMap);
+          });
         }
 
         await Fluttertoast.showToast(msg: "Successfully Registered");
         Navigator.push(
             context, MaterialPageRoute(builder: (c) => LoginScreen()));
-      }).catchError((err) {
+      } catch (error) {
         Fluttertoast.showToast(msg: "Registration Failed");
-      });
+      }
     } else {
       Fluttertoast.showToast(msg: "Something went wrong!!");
     }

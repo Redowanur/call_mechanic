@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShowMap extends StatefulWidget {
   @override
@@ -80,7 +82,7 @@ class ShowMapUI extends State<ShowMap> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
         builder: (context) => Container(
-              height: 500,
+              height: 350,
               child: ListView(
                 children: [
                   // DrawerHeader(
@@ -115,8 +117,15 @@ class ShowMapUI extends State<ShowMap> {
                       Icons.phone,
                       color: Color.fromRGBO(0, 103, 204, 1),
                     ),
-                    onTap: () {
-                      // mySnackBar('Contact', context);
+                    onTap: () async {
+                      final Uri url = Uri(scheme: 'tel', path: phone);
+
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      } else {
+                        await Fluttertoast.showToast(
+                            msg: 'Cannot find the phone number');
+                      }
                     },
                   ),
                   ListTile(
@@ -140,7 +149,19 @@ class ShowMapUI extends State<ShowMap> {
                     ),
                   ),
                   Center(
-                    child: ElevatedButton(onPressed: () {}, child: Text('ggg')),
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Request Service',
+                        style: TextStyle(
+                            fontFamily: 'UberMove', color: Colors.white),
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Color.fromRGBO(
+                                0, 103, 204, 1)), // Change this color
+                      ),
+                    ),
                   )
                 ],
               ),

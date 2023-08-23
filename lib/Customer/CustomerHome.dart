@@ -1,61 +1,124 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:call_mechanic/ShowMap.dart';
-import 'package:call_mechanic/ForgotPassword.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerHome extends StatefulWidget {
+  String id, name, phone;
+  CustomerHome(this.id, this.name, this.phone, {super.key});
+
   @override
   State<StatefulWidget> createState() {
-    return CustomerHomeUI();
+    return CustomerHomeUI(id, name, phone);
   }
 }
 
-myAlertDialog(context) {
-  return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Expanded(
-            child: AlertDialog(
-          title: Text('Alert !'),
-          content: Text('Do you want to Log out?'),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ForgotPassword()));
-                },
-                child: Text('Yes')),
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('No')),
-          ],
-        ));
-      });
+class Mechanic {
+  final String name;
+  final String status;
+  final String phone;
+  final double latitude, longitude;
+
+  Mechanic(
+      {required this.name,
+      required this.status,
+      required this.phone,
+      required this.latitude,
+      required this.longitude});
 }
 
 class CustomerHomeUI extends State<CustomerHome> {
-  int curIndex = 0;
+  String id, name, phone;
+  bool shouldRefresh = false;
+  List<Mechanic> mechanics = [];
+  CustomerHomeUI(this.id, this.name, this.phone);
+
+  @override
+  void initState() {
+    super.initState();
+    id = widget.id;
+    name = widget.name;
+    phone = widget.phone;
+    fetchMechanicsData();
+  }
+
+  myAlertDialog(context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Expanded(
+              child: AlertDialog(
+            title: Text('Alert !'),
+            content: Text('Do you want to cancel the request?'),
+            actions: [
+              TextButton(onPressed: () {}, child: Text('Yes')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('No')),
+            ],
+          ));
+        });
+  }
+
+  fetchMechanicsData() async {
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection('users').doc(id).get();
+
+    if (snapshot.exists) {
+      Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+
+      List<Map<String, dynamic>> requestsData =
+          List<Map<String, dynamic>>.from(userData['requests']);
+
+      for (Map<String, dynamic> request in requestsData) {
+        String name = request['name'];
+        String phone = request['phone'];
+        double latitude = request['latitude'];
+        double longitude = request['longitude'];
+        String status = request['status'];
+
+        Mechanic mechanic = Mechanic(
+          name: name,
+          status: status,
+          phone: phone,
+          latitude: latitude,
+          longitude: longitude,
+        );
+
+        mechanics.add(mechanic);
+      }
+
+      setState(() {}); // Trigger a UI update after fetching data
+    } else {
+      print('Document does not exist');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    bool darkTheme =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(0),
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.all(0),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Row(
                 children: [
                   Expanded(
                     flex: 35,
                     child: Text(
                       'Need A Mechanic?',
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'UberMove',
+                      ),
                     ),
                   ),
                   Expanded(
@@ -65,40 +128,122 @@ class CustomerHomeUI extends State<CustomerHome> {
                 ],
               ),
             ),
-            Align(
-              alignment: Alignment.centerLeft, // Align the button to the left
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ShowMap()));
-                },
-                child: Text(
-                  'Find One',
-                  style: TextStyle(
-                    fontSize: 16,
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                  20, 0, 20, 20), // Align the button to the left
+              child: Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      shouldRefresh = !shouldRefresh;
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ShowMap(id, name, phone)));
+                    },
+                    child: Text(
+                      'Find One',
+                      style: TextStyle(fontSize: 16, fontFamily: 'UberMove'),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.all(0),
+                        minimumSize: Size(90, 38),
+                        backgroundColor:
+                            darkTheme ? Colors.amber.shade300 : Colors.blue),
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(0),
-                    minimumSize: Size(90, 38),
-                    backgroundColor: Colors.amber.shade400),
+                ],
+              ),
+            ),
+            Container(
+              height: 6,
+              color: darkTheme
+                  ? Color.fromRGBO(112, 112, 112, 1)
+                  : Color.fromRGBO(236, 235, 235, 1),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Row(
+                children: [
+                  Container(
+                    child: Row(children: [
+                      Text(
+                        'Current Services',
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'UberMove',
+                        ),
+                      ),
+                    ]),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: mechanics.length,
+                itemBuilder: (context, index) {
+                  final mechanic = mechanics[index];
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+                    decoration: BoxDecoration(
+                      color: darkTheme
+                          ? Color.fromRGBO(112, 112, 112, 1)
+                          : Color.fromRGBO(236, 235, 235, 1),
+                      borderRadius: BorderRadius.circular(
+                          10), // Adjust the radius as needed
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        if (mechanic.status == 'Pending')
+                          myAlertDialog(context);
+                      },
+                      leading: CircleAvatar(child: Icon(Icons.person_sharp)),
+                      title: Text(mechanic.name),
+                      subtitle: Text(mechanic.status),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize
+                            .min, // Adjust the size of the Row as needed
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.location_pin),
+                            onPressed: () {
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //       builder: (context) => ShowMap(id)),
+                              // );
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.phone),
+                            onPressed: () async {
+                              final Uri url =
+                                  Uri(scheme: 'tel', path: mechanic.phone);
+
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                await Fluttertoast.showToast(
+                                    msg: 'Cannot find the phone number');
+                              }
+                            },
+                            // splashColor: Colors.red,
+                          ),
+                        ],
+                      ),
+                      tileColor: Colors
+                          .transparent, // Set to transparent to avoid overlapping with the container's background
+                    ),
+                  );
+                },
               ),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.amber.shade400,
-        currentIndex: curIndex,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-        ],
-        onTap: (int index) {
-          setState(() {
-            curIndex = index;
-          });
-        },
       ),
     );
   }

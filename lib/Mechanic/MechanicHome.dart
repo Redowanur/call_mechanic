@@ -4,6 +4,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MechanicHome extends StatefulWidget {
+  String id;
+
+  MechanicHome(this.id, {super.key});
+
   @override
   State<StatefulWidget> createState() {
     return MechanicHomeUI();
@@ -102,7 +106,7 @@ class MechanicHomeUI extends State<MechanicHome> {
             child: ListView.builder(
               itemCount: customers.length,
               itemBuilder: (context, index) {
-                final message = customers[index];
+                final customer = customers[index];
                 return Container(
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
                   decoration: BoxDecoration(
@@ -117,8 +121,8 @@ class MechanicHomeUI extends State<MechanicHome> {
                       myAlertDialog(context);
                     },
                     leading: CircleAvatar(child: Icon(Icons.person_sharp)),
-                    title: Text(message.name),
-                    subtitle: Text(message.status),
+                    title: Text(customer.name),
+                    subtitle: Text(customer.status),
                     trailing: Row(
                       mainAxisSize: MainAxisSize
                           .min, // Adjust the size of the Row as needed
@@ -126,11 +130,11 @@ class MechanicHomeUI extends State<MechanicHome> {
                         IconButton(
                           icon: Icon(Icons.location_pin),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ShowMap()),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => ShowMap()),
+                            // );
                           },
                         ),
                         IconButton(

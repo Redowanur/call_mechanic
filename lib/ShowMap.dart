@@ -8,13 +8,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ShowMap extends StatefulWidget {
+  String id, name1, phone1;
+  ShowMap(this.id, this.name1, this.phone1, {super.key});
+
   @override
   State<StatefulWidget> createState() {
-    return ShowMapUI();
+    return ShowMapUI(id, name1, phone1);
   }
 }
 
 class ShowMapUI extends State<ShowMap> {
+  bool isButtonEnabled = true;
+  String id, name1, phone1;
+  ShowMapUI(this.id, this.name1, this.phone1);
+
   Set<Marker> markers = {};
   late GoogleMapController googleMapController;
 
@@ -74,8 +81,31 @@ class ShowMapUI extends State<ShowMap> {
         fontFamily: 'UberMove', color: Color.fromRGBO(0, 103, 204, 1));
   }
 
-  Future _displayMechanicInfo(BuildContext context, String name, String phone,
-      String address, String rating) {
+  Future<void> foo(String id1) async {
+    final CollectionReference users =
+        FirebaseFirestore.instance.collection('users');
+    Position position = await _determinePosition();
+    Map<String, dynamic> newRequestForMechanic = {
+      'name': name1,
+      'phone': phone1,
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+      'status': 'Pending',
+    };
+    await users.doc(id1).update({
+      'requests': FieldValue.arrayUnion([newRequestForMechanic]),
+    });
+  }
+
+  Future _displayMechanicInfo(
+      BuildContext context,
+      String id1,
+      String name,
+      String phone,
+      String address,
+      String rating,
+      double latitude,
+      double longitude) {
     return showModalBottomSheet(
         context: context,
         backgroundColor: Color.fromRGBO(200, 235, 235, 1),
@@ -85,16 +115,6 @@ class ShowMapUI extends State<ShowMap> {
               height: 350,
               child: ListView(
                 children: [
-                  // DrawerHeader(
-                  //   padding: EdgeInsets.all(0),
-                  //   child: UserAccountsDrawerHeader(
-                  //     // decoration: BoxDecoration(color: Colors.cyan),
-                  //     accountName: Text('Redowanur Rahman'),
-                  //     accountEmail: Text('rahmanlabibn74@gmail.com'),
-                  //     currentAccountPicture: Image.network(
-                  //         'https://pluspng.com/img-png/user-png-icon-download-icons-logos-emojis-users-2240.png'),
-                  //   ),
-                  // ),
                   SizedBox(
                     height: 30,
                   ),
@@ -150,7 +170,30 @@ class ShowMapUI extends State<ShowMap> {
                   ),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        try {
+                          final CollectionReference users =
+                              FirebaseFirestore.instance.collection('users');
+
+                          // Create the new request map
+                          Map<String, dynamic> newRequest = {
+                            'name': name,
+                            'phone': phone,
+                            'latitude': latitude,
+                            'longitude': longitude,
+                            'status': 'Pending',
+                          };
+                          // Update the document with the new request
+                          await users.doc(id).update({
+                            'requests': FieldValue.arrayUnion([newRequest]),
+                          });
+                          foo(id1);
+                          Fluttertoast.showToast(msg: "Requested Service");
+                        } catch (error) {
+                          print('Error: $error');
+                          // Handle error
+                        }
+                      },
                       child: Text(
                         'Request Service',
                         style: TextStyle(
@@ -180,8 +223,15 @@ class ShowMapUI extends State<ShowMap> {
             markerId: MarkerId(user['id']), // Replace with a unique ID
             position: LatLng(latitude, longitude),
             onTap: () {
-              _displayMechanicInfo(context, user['name'], user['phone'],
-                  user['address'], user['rating'].toString());
+              _displayMechanicInfo(
+                  context,
+                  user['id'],
+                  user['name'],
+                  user['phone'],
+                  user['address'],
+                  user['rating'].toString(),
+                  latitude,
+                  longitude);
             });
       }));
     });

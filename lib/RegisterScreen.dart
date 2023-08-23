@@ -26,6 +26,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String defrole = 'Select Role';
   bool isOnline = true;
   double latitude = 0, longitude = 0, rating = 0;
+  int reviews = 0;
+  List<Map<String, dynamic>> requests = [];
 
   bool _passwordvis = false;
 
@@ -54,6 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'role': defrole,
             'latitude': latitude,
             'longitude': longitude,
+            'requests': requests,
           });
         } else if (defrole == 'Mechanic') {
           await userRef.doc(currentUser!.uid).set({
@@ -67,6 +70,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'latitude': latitude,
             'longitude': longitude,
             'rating': rating,
+            'reviews': reviews,
+            'requests': requests,
           });
         }
 
@@ -486,7 +491,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     _submit();
                                   },
                                   child: Text(
-                                    "Register",
+                                    "Sign Up",
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,

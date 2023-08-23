@@ -23,8 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
   String rolep = '';
   String id = '';
   String name = '';
+  String phone = '';
   double rating = 0.0;
   bool _passwordvis = false;
+  List<Map<String, dynamic>> requests = [];
 
   void _submit() async {
     print(emailtext.text.trim());
@@ -53,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
           rolep = userData['role'];
           id = userData['id'];
           name = userData['name'];
+          phone = userData['phone'];
           // if (rolep == "Mechanic") rating = userData['rating'];
         } else {
           print('No data available.');
@@ -62,8 +65,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (c) =>
-                      Customer(id, name))); // replace with user profile page
+                  builder: (c) => Customer(
+                      id, name, phone))); // replace with user profile page
         } else if (rolep == "Mechanic") {
           Navigator.push(
               context,
@@ -249,7 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     _submit();
                                   },
                                   child: Text(
-                                    "Log In",
+                                    "Sign In",
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,

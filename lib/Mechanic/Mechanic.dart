@@ -1,7 +1,4 @@
-import 'package:call_mechanic/Mechanic/MechanicMap.dart';
 import 'package:call_mechanic/Mechanic/MechanicProfile.dart';
-import 'package:call_mechanic/Mechanic/MechanicSettings.dart';
-import 'package:call_mechanic/ShowMap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -30,8 +27,7 @@ class MechanicUI extends State<Mechanic> {
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     List pages = [
-      MechanicHome(),
-      MechanicMap(),
+      MechanicHome(id),
       MechanicProfile(id, name),
       // MechanicSettings(),
     ];
@@ -57,8 +53,6 @@ class MechanicUI extends State<Mechanic> {
           showUnselectedLabels: false,
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.location_pin), label: 'Map'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
           ],
           onTap: (int index) {

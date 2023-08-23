@@ -4,30 +4,30 @@ import 'package:flutter/services.dart';
 import 'CustomerProfile.dart';
 
 class Customer extends StatefulWidget {
-  String id, name;
-  Customer(this.id, this.name, {super.key});
+  String id, name, phone;
+  Customer(this.id, this.name, this.phone, {super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return CustomerUI(id, name);
+    return CustomerUI(id, name, phone);
   }
 }
 
 class CustomerUI extends State<Customer> {
-  String id, name;
+  String id, name, phone;
   int curIndex = 0;
 
-  CustomerUI(this.id, this.name);
-
-  List pages = [
-    CustomerHome(),
-    CustomerProfile(),
-  ];
+  CustomerUI(this.id, this.name, this.phone);
 
   @override
   Widget build(BuildContext context) {
     bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    List pages = [
+      CustomerHome(id, name, phone),
+      CustomerProfile(),
+    ];
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: darkTheme

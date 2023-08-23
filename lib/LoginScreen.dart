@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
 import 'Mechanic/Mechanic.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String phone = '';
   double rating = 0.0;
   bool _passwordvis = false;
+  bool isOnline = false;
   List<Map<String, dynamic>> requests = [];
 
   void _submit() async {
@@ -56,12 +58,17 @@ class _LoginScreenState extends State<LoginScreen> {
           id = userData['id'];
           name = userData['name'];
           phone = userData['phone'];
-          // if (rolep == "Mechanic") rating = userData['rating'];
+          if (rolep == 'Mechanic') {
+            isOnline = userData['isOnline'];
+          }
         } else {
           print('No data available.');
         }
 
         if (rolep == "User") {
+          // Position position = await _determinePosition();
+          // double latitude = position.latitude;
+          // double longitude = position.longitude;
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -71,8 +78,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (c) => Mechanic(
-                      id, name))); // replace with mechanic profile page
+                  builder: (c) => Mechanic(id, name,
+                      isOnline))); // replace with mechanic profile page
         }
       } catch (error) {
         Fluttertoast.showToast(msg: "Log In Failed");
@@ -327,5 +334,34 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ));
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permission denied.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+
+    return position;
   }
 }

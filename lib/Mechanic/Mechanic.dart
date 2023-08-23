@@ -7,19 +7,21 @@ import 'MechanicHome.dart';
 // ignore: must_be_immutable
 class Mechanic extends StatefulWidget {
   String id, name;
-  Mechanic(this.id, this.name, {super.key});
+  bool isOnline;
+  Mechanic(this.id, this.name, this.isOnline, {super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return MechanicUI(id, name);
+    return MechanicUI(id, name, isOnline);
   }
 }
 
 class MechanicUI extends State<Mechanic> {
   String id, name;
+  bool isOnline;
   int curIndex = 0;
 
-  MechanicUI(this.id, this.name);
+  MechanicUI(this.id, this.name, this.isOnline);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class MechanicUI extends State<Mechanic> {
 
     List pages = [
       MechanicHome(id),
-      MechanicProfile(id, name),
+      MechanicProfile(id, name, isOnline),
       // MechanicSettings(),
     ];
 

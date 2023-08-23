@@ -5,7 +5,8 @@ import 'CustomerProfile.dart';
 
 class Customer extends StatefulWidget {
   String id, name, phone;
-  Customer(this.id, this.name, this.phone, {super.key});
+  // double latitude, longitude;
+  Customer(this.id, this.name, this.phone);
 
   @override
   State<StatefulWidget> createState() {
@@ -15,6 +16,7 @@ class Customer extends StatefulWidget {
 
 class CustomerUI extends State<Customer> {
   String id, name, phone;
+  // double latitude, longitude;
   int curIndex = 0;
 
   CustomerUI(this.id, this.name, this.phone);

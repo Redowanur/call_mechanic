@@ -6,7 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class CustomerHome extends StatefulWidget {
   String id, name, phone;
-  CustomerHome(this.id, this.name, this.phone, {super.key});
+  // double latitude, longitude;
+  CustomerHome(this.id, this.name, this.phone);
 
   @override
   State<StatefulWidget> createState() {
@@ -15,13 +16,15 @@ class CustomerHome extends StatefulWidget {
 }
 
 class Mechanic {
+  final String id;
   final String name;
   final String status;
   final String phone;
   final double latitude, longitude;
 
   Mechanic(
-      {required this.name,
+      {required this.id,
+      required this.name,
       required this.status,
       required this.phone,
       required this.latitude,
@@ -30,6 +33,7 @@ class Mechanic {
 
 class CustomerHomeUI extends State<CustomerHome> {
   String id, name, phone;
+  // double latitude, longitude;
   bool shouldRefresh = false;
   List<Mechanic> mechanics = [];
   CustomerHomeUI(this.id, this.name, this.phone);
@@ -43,25 +47,53 @@ class CustomerHomeUI extends State<CustomerHome> {
     fetchMechanicsData();
   }
 
-  myAlertDialog(context) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Expanded(
-              child: AlertDialog(
-            title: Text('Alert !'),
-            content: Text('Do you want to cancel the request?'),
-            actions: [
-              TextButton(onPressed: () {}, child: Text('Yes')),
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('No')),
-            ],
-          ));
-        });
-  }
+  // Future<void> deleteMechanicData(Mechanic mechanic) async {
+  //   try {
+  //     Position position = await _determinePosition();
+  //     // Step 1: Delete the customer data from the mechanic's table
+  //     await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(mechanic.id) // mechanic's id
+  //         .update({
+  //       'requests': FieldValue.arrayRemove([
+  //         {
+  //           'name': name,
+  //           'phone': phone,
+  //           'latitude': position.latitude,
+  //           'longitude': position.longitude,
+  //           'status': mechanic.status,
+  //         }
+  //       ]),
+  //     });
+
+  //     // Step 2: Delete the mechanic data from the customer's table
+  //     await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(id) // customer's id
+  //         .update({
+  //       'requests': FieldValue.arrayRemove([
+  //         {
+  //           'id': mechanic.id, // mechanic's id
+  //           'name': mechanic.name,
+  //           'phone': mechanic.phone,
+  //           'latitude': mechanic.latitude,
+  //           'longitude': mechanic.longitude,
+  //           'status': mechanic.status,
+  //         }
+  //       ]),
+  //     });
+
+  //     // Update the local mechanics list
+  //     setState(() {
+  //       mechanics.remove(mechanic);
+  //     });
+
+  //     Fluttertoast.showToast(msg: 'Mechanic deleted successfully');
+  //   } catch (error) {
+  //     Fluttertoast.showToast(msg: 'Failed to delete mechanic');
+  //     print('Error: $error');
+  //   }
+  // }
 
   fetchMechanicsData() async {
     DocumentSnapshot snapshot =
@@ -74,6 +106,7 @@ class CustomerHomeUI extends State<CustomerHome> {
           List<Map<String, dynamic>>.from(userData['requests']);
 
       for (Map<String, dynamic> request in requestsData) {
+        String id = request['id'];
         String name = request['name'];
         String phone = request['phone'];
         double latitude = request['latitude'];
@@ -81,6 +114,7 @@ class CustomerHomeUI extends State<CustomerHome> {
         String status = request['status'];
 
         Mechanic mechanic = Mechanic(
+          id: id,
           name: name,
           status: status,
           phone: phone,
@@ -198,8 +232,49 @@ class CustomerHomeUI extends State<CustomerHome> {
                     ),
                     child: ListTile(
                       onTap: () {
-                        if (mechanic.status == 'Pending')
-                          myAlertDialog(context);
+                        if (mechanic.status == 'Pending') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm Deletion'),
+                                content:
+                                    Text('Do you want to cancel the request?'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        // deleteMechanicData(mechanic);
+                                        Navigator.of(context).pop();
+                                        Fluttertoast.showToast(
+                                            msg: "Canceled Request");
+                                      },
+                                      child: Text(
+                                        'Yes',
+                                        style: TextStyle(
+                                          fontFamily: 'UberMove',
+                                          color: darkTheme
+                                              ? Colors.amber.shade300
+                                              : Colors.blue,
+                                        ),
+                                      )),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        'No',
+                                        style: TextStyle(
+                                          fontFamily: 'UberMove',
+                                          color: darkTheme
+                                              ? Colors.amber.shade300
+                                              : Colors.blue,
+                                        ),
+                                      )),
+                                ],
+                              );
+                            },
+                          );
+                        }
                       },
                       leading: CircleAvatar(child: Icon(Icons.person_sharp)),
                       title: Text(mechanic.name),
@@ -247,4 +322,33 @@ class CustomerHomeUI extends State<CustomerHome> {
       ),
     );
   }
+
+  // Future<Position> _determinePosition() async {
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
+
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+  //   if (!serviceEnabled) {
+  //     return Future.error('Location services are disabled.');
+  //   }
+
+  //   permission = await Geolocator.checkPermission();
+
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+
+  //     if (permission == LocationPermission.denied) {
+  //       return Future.error('Location permission denied.');
+  //     }
+  //   }
+
+  //   if (permission == LocationPermission.deniedForever) {
+  //     return Future.error('Location permissions are permanently denied');
+  //   }
+
+  //   Position position = await Geolocator.getCurrentPosition();
+
+  //   return position;
+  // }
 }

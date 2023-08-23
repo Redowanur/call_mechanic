@@ -9,7 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ShowMap extends StatefulWidget {
   String id, name1, phone1;
-  ShowMap(this.id, this.name1, this.phone1, {super.key});
+  // double latitude, longitude;
+  ShowMap(this.id, this.name1, this.phone1);
 
   @override
   State<StatefulWidget> createState() {
@@ -19,6 +20,7 @@ class ShowMap extends StatefulWidget {
 
 class ShowMapUI extends State<ShowMap> {
   bool isButtonEnabled = true;
+  // double latitude, longitude;
   String id, name1, phone1;
   ShowMapUI(this.id, this.name1, this.phone1);
 
@@ -177,6 +179,7 @@ class ShowMapUI extends State<ShowMap> {
 
                           // Create the new request map
                           Map<String, dynamic> newRequest = {
+                            'id': id1,
                             'name': name,
                             'phone': phone,
                             'latitude': latitude,

@@ -7,20 +7,21 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MechanicProfile extends StatefulWidget {
   String id, name;
-  MechanicProfile(this.id, this.name);
+  bool isOnline;
+  MechanicProfile(this.id, this.name, this.isOnline);
 
   @override
   State<StatefulWidget> createState() {
-    return MechanicProfileUI(id, name);
+    return MechanicProfileUI(id, name, isOnline);
   }
 }
 
 class MechanicProfileUI extends State<MechanicProfile> {
   String id, name;
-  bool isOnline = true;
+  bool isOnline;
   late GoogleMapController googleMapController;
 
-  MechanicProfileUI(this.id, this.name);
+  MechanicProfileUI(this.id, this.name, this.isOnline);
 
   final userDocRef = FirebaseFirestore.instance.collection('users');
 

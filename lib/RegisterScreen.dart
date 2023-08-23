@@ -24,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final passwordtext = TextEditingController();
   final confimtext = TextEditingController();
   String defrole = 'Select Role';
-  bool isOnline = true;
+  bool isOnline = false;
   double latitude = 0, longitude = 0, rating = 0;
   int reviews = 0;
   List<Map<String, dynamic>> requests = [];

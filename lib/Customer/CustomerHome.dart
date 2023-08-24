@@ -4,6 +4,8 @@ import 'package:call_mechanic/ShowMap.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/MechanicData.dart';
+
 class CustomerHome extends StatefulWidget {
   String id, name, phone;
   // double latitude, longitude;
@@ -104,27 +106,24 @@ class CustomerHomeUI extends State<CustomerHome> {
     if (snapshot.exists) {
       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
 
-      List<Map<String, dynamic>> requestsData =
-          List<Map<String, dynamic>>.from(userData['requests']);
+      if (userData.containsKey('id1Array')) {
+        dynamic arrayData = userData['id1Array'];
+        if (arrayData is List<dynamic>) {
+          for (var i in arrayData) {
+            var mecha = await MechanicModel.fetchMechanicData(i);
 
-      for (Map<String, dynamic> request in requestsData) {
-        String id = request['id'];
-        String name = request['name'];
-        String phone = request['phone'];
-        double latitude = request['latitude'];
-        double longitude = request['longitude'];
-        String status = request['status'];
+            Mechanic mechanic = Mechanic(
+              id: id,
+              name: mecha.name,
+              status: 'status',
+              phone: mecha.phone,
+              latitude: mecha.latitude,
+              longitude: mecha.longitude,
+            );
 
-        Mechanic mechanic = Mechanic(
-          id: id,
-          name: name,
-          status: status,
-          phone: phone,
-          latitude: latitude,
-          longitude: longitude,
-        );
-
-        mechanics.add(mechanic);
+            mechanics.add(mechanic);
+          }
+        }
       }
 
       setState(() {}); // Trigger a UI update after fetching data

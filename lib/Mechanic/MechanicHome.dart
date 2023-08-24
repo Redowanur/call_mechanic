@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../Navigation.dart';
+import '../models/CustomerData.dart';
 import '../models/MechanicData.dart';
 
 class MechanicHome extends StatefulWidget {
@@ -47,33 +48,32 @@ class MechanicHomeUI extends State<MechanicHome> {
   }
 
   fetchCustomerData() async {
-    DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection('users').doc(id).get();
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('CustomerRequests')
+        .doc(id)
+        .get();
 
     if (snapshot.exists) {
       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
 
-      List<Map<String, dynamic>> requestsData =
-          List<Map<String, dynamic>>.from(userData['requests']);
+      if (userData.containsKey('idArray')) {
+        dynamic arrayData = userData['idArray'];
+        if (arrayData is List<dynamic>) {
+          for (var i in arrayData) {
+            var cust = await CustomerModel.fetchCustomerData(i);
 
-      for (Map<String, dynamic> request in requestsData) {
-        String id = request['id'];
-        String name = request['name'];
-        String phone = request['phone'];
-        double latitude = request['latitude'];
-        double longitude = request['longitude'];
-        String status = request['status'];
+            Customer customer = Customer(
+              id: id,
+              name: cust.name,
+              status: 'status',
+              phone: cust.phone,
+              latitude: cust.latitude,
+              longitude: cust.longitude,
+            );
 
-        Customer customer = Customer(
-          id: id,
-          name: name,
-          status: status,
-          phone: phone,
-          latitude: latitude,
-          longitude: longitude,
-        );
-
-        customers.add(customer);
+            customers.add(customer);
+          }
+        }
       }
 
       setState(() {}); // Trigger a UI update after fetching data

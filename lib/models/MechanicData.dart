@@ -1,19 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MechanicModel {
+  String? id;
   bool? ionline;
-  double? latitude;
-  double? longitude;
-  String? name;
-  String? phone;
+  double latitude;
+  double longitude;
+  String name;
+  String phone;
   double? rating;
 
   MechanicModel({
+    this.id,
     this.ionline,
-    this.latitude,
-    this.longitude,
-    this.name,
-    this.phone,
+    required this.latitude,
+    required this.longitude,
+    required this.name,
+    required this.phone,
     this.rating,
   });
 
@@ -25,6 +27,7 @@ class MechanicModel {
       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
       // Create a new MechanicModel object with the fetched data
       return MechanicModel(
+        id: userData['id'],
         ionline: userData['isOnline'],
         latitude: userData['latitude'],
         longitude: userData['longitude'],

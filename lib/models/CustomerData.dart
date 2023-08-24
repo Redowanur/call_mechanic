@@ -2,19 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CustomerModel {
   bool? ionline;
-  double? latitude;
-  double? longitude;
-  String? name;
-  String? phone;
+  double latitude;
+  double longitude;
+  String name;
+  String phone;
   double? rating;
   int? totalRequests;
 
   CustomerModel({
     this.ionline,
-    this.latitude,
-    this.longitude,
-    this.name,
-    this.phone,
+    required this.latitude,
+    required this.longitude,
+    required this.name,
+    required this.phone,
     this.rating,
     this.totalRequests,
   });

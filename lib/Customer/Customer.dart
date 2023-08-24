@@ -28,7 +28,7 @@ class CustomerUI extends State<Customer> {
 
     List pages = [
       CustomerHome(id, name, phone),
-      CustomerProfile(),
+      CustomerProfile(id, name),
     ];
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../Navigation.dart';
+import '../models/MechanicData.dart';
+
 class MechanicHome extends StatefulWidget {
   String id;
 
@@ -169,7 +172,21 @@ class MechanicHomeUI extends State<MechanicHome> {
                       children: [
                         IconButton(
                           icon: Icon(Icons.location_pin),
-                          onPressed: () {},
+                          onPressed: () async {
+                            var mechanic =
+                                await MechanicModel.fetchdata(widget.id);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Navigate2Customer(
+                                  mechanic.latitude ?? 0.0,
+                                  mechanic.longitude ?? 0.0,
+                                  24.8917,
+                                  91.8601,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                         IconButton(
                           icon: Icon(Icons.phone),

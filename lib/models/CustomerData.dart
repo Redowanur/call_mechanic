@@ -1,40 +1,43 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MechanicModel {
+class CustomerModel {
   bool? ionline;
   double? latitude;
   double? longitude;
   String? name;
   String? phone;
   double? rating;
+  int? totalRequests;
 
-  MechanicModel({
+  CustomerModel({
     this.ionline,
     this.latitude,
     this.longitude,
     this.name,
     this.phone,
     this.rating,
+    this.totalRequests,
   });
 
-  static Future<MechanicModel> fetchMechanicData(String id) async {
+  static Future<CustomerModel> fetchCustomerData(String id) async {
     DocumentSnapshot snapshot =
         await FirebaseFirestore.instance.collection('users').doc(id).get();
 
     if (snapshot.exists) {
       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
       // Create a new MechanicModel object with the fetched data
-      return MechanicModel(
+      return CustomerModel(
         ionline: userData['isOnline'],
         latitude: userData['latitude'],
         longitude: userData['longitude'],
         name: userData['name'],
         phone: userData['phone'],
         rating: userData['rating'],
+        totalRequests: userData['totalRequests'],
       );
     } else {
       // If the document doesn't exist, throw an exception
-      throw Exception('Mechanic data not found for ID: $id');
+      throw Exception('Customer data not found for ID: $id');
     }
   }
 }

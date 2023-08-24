@@ -18,13 +18,15 @@ class MechanicHome extends StatefulWidget {
 }
 
 class Customer {
+  final String id;
   final String name;
   final String status;
   final String phone;
   final double latitude, longitude;
 
   Customer(
-      {required this.name,
+      {required this.id,
+      required this.name,
       required this.status,
       required this.phone,
       required this.latitude,
@@ -55,6 +57,7 @@ class MechanicHomeUI extends State<MechanicHome> {
           List<Map<String, dynamic>>.from(userData['requests']);
 
       for (Map<String, dynamic> request in requestsData) {
+        String id = request['id'];
         String name = request['name'];
         String phone = request['phone'];
         double latitude = request['latitude'];
@@ -62,6 +65,7 @@ class MechanicHomeUI extends State<MechanicHome> {
         String status = request['status'];
 
         Customer customer = Customer(
+          id: id,
           name: name,
           status: status,
           phone: phone,
@@ -78,12 +82,60 @@ class MechanicHomeUI extends State<MechanicHome> {
     }
   }
 
+  Future<void> deleteCustomerData(Customer customer) async {
+    try {
+      // Position position = await _determinePosition();
+      // // Step 1: Delete the customer data from the mechanic's table
+      // await FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(mechanic.id) // mechanic's id
+      //     .update({
+      //   'requests': FieldValue.arrayRemove([
+      //     {
+      //       'name': name,
+      //       'phone': phone,
+      //       'latitude': position.latitude,
+      //       'longitude': position.longitude,
+      //       'status': mechanic.status,
+      //     }
+      //   ]),
+      // });
+
+      // Step 2: Delete the mechanic data from the customer's table
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(id) // customer's id
+          .update({
+        'requests': FieldValue.arrayRemove([
+          {
+            'id': customer.id, // mechanic's id
+            'name': customer.name,
+            'phone': customer.phone,
+            'latitude': customer.latitude,
+            'longitude': customer.longitude,
+            'status': customer.status,
+          }
+        ]),
+      });
+
+      // Update the local mechanics list
+      setState(() {
+        customers.remove(customer);
+      });
+
+      Fluttertoast.showToast(msg: 'Mechanic deleted successfully');
+    } catch (error) {
+      Fluttertoast.showToast(msg: 'Failed to delete mechanic');
+      print('Error: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
-    myAlertDialog(context) {
+    myAlertDialog(context, Customer customer) {
       return showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -106,6 +158,7 @@ class MechanicHomeUI extends State<MechanicHome> {
                     )),
                 TextButton(
                     onPressed: () {
+                      deleteCustomerData(customer);
                       Navigator.of(context).pop();
                       Fluttertoast.showToast(msg: "Deleted Request");
                     },
@@ -161,7 +214,7 @@ class MechanicHomeUI extends State<MechanicHome> {
                   ),
                   child: ListTile(
                     onTap: () {
-                      myAlertDialog(context);
+                      myAlertDialog(context, customer);
                     },
                     leading: CircleAvatar(child: Icon(Icons.person_sharp)),
                     title: Text(customer.name),
@@ -174,15 +227,16 @@ class MechanicHomeUI extends State<MechanicHome> {
                           icon: Icon(Icons.location_pin),
                           onPressed: () async {
                             var mechanic =
-                                await MechanicModel.fetchdata(widget.id);
+                                await MechanicModel.fetchMechanicData(
+                                    widget.id);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Navigate2Customer(
                                   mechanic.latitude ?? 0.0,
                                   mechanic.longitude ?? 0.0,
-                                  24.8917,
-                                  91.8601,
+                                  customer.latitude,
+                                  customer.longitude,
                                 ),
                               ),
                             );
@@ -192,7 +246,7 @@ class MechanicHomeUI extends State<MechanicHome> {
                           icon: Icon(Icons.phone),
                           onPressed: () async {
                             final Uri url =
-                                Uri(scheme: 'tel', path: '01521783854');
+                                Uri(scheme: 'tel', path: customer.phone);
 
                             if (await canLaunchUrl(url)) {
                               await launchUrl(url);

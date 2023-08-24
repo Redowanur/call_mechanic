@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../models/CustomerData.dart';
 
 class ShowMap extends StatefulWidget {
   String id, name1, phone1;
@@ -20,9 +21,10 @@ class ShowMap extends StatefulWidget {
 
 class ShowMapUI extends State<ShowMap> {
   bool isButtonEnabled = true;
-  // double latitude, longitude;
-  String id, name1, phone1;
+  int cnt = 0, cntm = 0;
+  String id, name1, phone1, idm = '';
   ShowMapUI(this.id, this.name1, this.phone1);
+  final userDocRef = FirebaseFirestore.instance.collection('users');
 
   Set<Marker> markers = {};
   late GoogleMapController googleMapController;
@@ -76,6 +78,25 @@ class ShowMapUI extends State<ShowMap> {
     super.initState();
     getPolyPoints();
     fetchAndDisplayOnlineMechanics();
+    fook();
+  }
+
+  void fook() async {
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(id).get();
+    if (userDoc.exists) {
+      var userData = userDoc.data() as Map<String, dynamic>;
+      cnt = userData['totalRequests'];
+    }
+  }
+
+  Future<void> fook2(String hh) async {
+    final userDocM =
+        await FirebaseFirestore.instance.collection('users').doc(hh).get();
+    if (userDocM.exists) {
+      var userDataM = userDocM.data() as Map<String, dynamic>;
+      cntm = userDataM['totalRequests'];
+    }
   }
 
   TextStyle infoStyle() {
@@ -84,19 +105,20 @@ class ShowMapUI extends State<ShowMap> {
   }
 
   Future<void> foo(String id1) async {
-    final CollectionReference users =
-        FirebaseFirestore.instance.collection('users');
-    Position position = await _determinePosition();
-    Map<String, dynamic> newRequestForMechanic = {
-      'name': name1,
-      'phone': phone1,
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-      'status': 'Pending',
-    };
-    await users.doc(id1).update({
-      'requests': FieldValue.arrayUnion([newRequestForMechanic]),
+    final CollectionReference customerReq =
+        FirebaseFirestore.instance.collection('CustomerRequests');
+    await fook2(id1);
+    if (cntm == 0) {
+      await customerReq.doc(id1).set({
+        'idArray': '',
+      });
+    }
+
+    await customerReq.doc(id1).update({
+      'idArray': FieldValue.arrayUnion([id]),
     });
+    cntm++;
+    await userDocRef.doc(id1).update({'totalRequests': cntm});
   }
 
   Future _displayMechanicInfo(
@@ -172,39 +194,32 @@ class ShowMapUI extends State<ShowMap> {
                   ),
                   Center(
                     child: ElevatedButton(
-                      onPressed: isButtonEnabled
-                          ? () async {
-                              try {
-                                final CollectionReference users =
-                                    FirebaseFirestore.instance
-                                        .collection('users');
+                      onPressed: () async {
+                        try {
+                          final CollectionReference mechanicReq =
+                              FirebaseFirestore.instance
+                                  .collection('MechanicRequests');
+                          // customrs id
+                          if (cnt == 0) {
+                            await mechanicReq.doc(id).set({
+                              'id1Array': '',
+                            });
+                          }
 
-                                // Create the new request map
-                                Map<String, dynamic> newRequest = {
-                                  'id': id1,
-                                  'name': name,
-                                  'phone': phone,
-                                  'latitude': latitude,
-                                  'longitude': longitude,
-                                  'status': 'Pending',
-                                };
-                                // Update the document with the new request
-                                await users.doc(id).update({
-                                  'requests':
-                                      FieldValue.arrayUnion([newRequest]),
-                                });
-                                foo(id1);
-                                Fluttertoast.showToast(
-                                    msg: "Requested Service");
-                              } catch (error) {
-                                print('Error: $error');
-                                // Handle error
-                              }
-                              setState(() {
-                                isButtonEnabled = false;
-                              });
-                            }
-                          : null,
+                          await mechanicReq.doc(id).update({
+                            'id1Array': FieldValue.arrayUnion([id1]),
+                          });
+                          cnt++;
+                          await userDocRef
+                              .doc(id)
+                              .update({'totalRequests': cnt});
+                          foo(id1);
+                          Fluttertoast.showToast(msg: "Requested Service");
+                        } catch (error) {
+                          print('Error: $error');
+                          // Handle error
+                        }
+                      },
                       child: Text(
                         'Request Service',
                         style: TextStyle(
@@ -229,6 +244,7 @@ class ShowMapUI extends State<ShowMap> {
       markers.addAll(onlineMechanics.map((user) {
         double latitude = user['latitude'] as double;
         double longitude = user['longitude'] as double;
+        idm = user['id'];
 
         return Marker(
             markerId: MarkerId(user['id']), // Replace with a unique ID

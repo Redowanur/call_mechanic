@@ -25,6 +25,7 @@ class MechanicUI extends State<Mechanic> {
 
   @override
   Widget build(BuildContext context) {
+    print(isOnline);
     bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 

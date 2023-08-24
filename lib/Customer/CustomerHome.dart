@@ -96,8 +96,10 @@ class CustomerHomeUI extends State<CustomerHome> {
   // }
 
   fetchMechanicsData() async {
-    DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection('users').doc(id).get();
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('MechanicRequests')
+        .doc(id)
+        .get();
 
     if (snapshot.exists) {
       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;

@@ -40,19 +40,31 @@ class MechanicProfileUI extends State<MechanicProfile> {
               content: Text('Do you want to Log out?'),
               actions: [
                 TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (c) => LoginScreen()));
-                      Fluttertoast.showToast(msg: "Logged out");
-                    },
-                    child: Text(
-                      'Yes',
-                      style: TextStyle(
-                        fontFamily: 'UberMove',
-                        color: darkTheme ? Colors.amber.shade300 : Colors.blue,
-                      ),
-                    )),
+                  child: Text(
+                    'Yes',
+                    style: TextStyle(
+                      fontFamily: 'UberMove',
+                      color: darkTheme ? Colors.amber.shade300 : Colors.blue,
+                    ),
+                  ),
+                  onPressed: () async {
+                    setState(() async {
+                      isOnline = false;
+                      if (!isOnline) {
+                        await userDocRef.doc(id).update({
+                          'isOnline': false,
+                          'latitude': 0,
+                          'longitude': 0,
+                        });
+
+                        Navigator.of(context).pop();
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (c) => LoginScreen()));
+                        Fluttertoast.showToast(msg: "Logged out");
+                      }
+                    });
+                  },
+                ),
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();

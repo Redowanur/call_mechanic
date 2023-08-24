@@ -172,31 +172,39 @@ class ShowMapUI extends State<ShowMap> {
                   ),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          final CollectionReference users =
-                              FirebaseFirestore.instance.collection('users');
+                      onPressed: isButtonEnabled
+                          ? () async {
+                              try {
+                                final CollectionReference users =
+                                    FirebaseFirestore.instance
+                                        .collection('users');
 
-                          // Create the new request map
-                          Map<String, dynamic> newRequest = {
-                            'id': id1,
-                            'name': name,
-                            'phone': phone,
-                            'latitude': latitude,
-                            'longitude': longitude,
-                            'status': 'Pending',
-                          };
-                          // Update the document with the new request
-                          await users.doc(id).update({
-                            'requests': FieldValue.arrayUnion([newRequest]),
-                          });
-                          foo(id1);
-                          Fluttertoast.showToast(msg: "Requested Service");
-                        } catch (error) {
-                          print('Error: $error');
-                          // Handle error
-                        }
-                      },
+                                // Create the new request map
+                                Map<String, dynamic> newRequest = {
+                                  'id': id1,
+                                  'name': name,
+                                  'phone': phone,
+                                  'latitude': latitude,
+                                  'longitude': longitude,
+                                  'status': 'Pending',
+                                };
+                                // Update the document with the new request
+                                await users.doc(id).update({
+                                  'requests':
+                                      FieldValue.arrayUnion([newRequest]),
+                                });
+                                foo(id1);
+                                Fluttertoast.showToast(
+                                    msg: "Requested Service");
+                              } catch (error) {
+                                print('Error: $error');
+                                // Handle error
+                              }
+                              setState(() {
+                                isButtonEnabled = false;
+                              });
+                            }
+                          : null,
                       child: Text(
                         'Request Service',
                         style: TextStyle(

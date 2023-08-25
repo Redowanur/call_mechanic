@@ -45,10 +45,10 @@ class MechanicHomeUI extends State<MechanicHome> {
   void initState() {
     super.initState();
     id = widget.id;
-    fetchCustomerData();
+    fetchCustomersData();
   }
 
-  fetchCustomerData() async {
+  fetchCustomersData() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
         .collection('CustomerRequests')
         .doc(id)
@@ -60,18 +60,26 @@ class MechanicHomeUI extends State<MechanicHome> {
       if (userData.containsKey('idArray')) {
         dynamic arrayData = userData['idArray'];
         if (arrayData is List<dynamic>) {
-          for (var i in arrayData) {
-            var cust = await CustomerModel.fetchCustomerData(i);
+          for (String i in arrayData) {
+            String ii = i.substring(0, i.length - 1);
+            String status = i.substring(i.length - 1);
+            var cust = await CustomerModel.fetchCustomerData(ii);
+
+            if (status == '0') {
+              status = 'Pending';
+            } else if (status == '1') {
+              status = 'Accepted';
+            }
 
             Customer customer = Customer(
-              id: id,
+              id: ii,
               name: cust.name,
-              status: 'status',
+              status: status,
               phone: cust.phone,
               latitude: cust.latitude,
               longitude: cust.longitude,
             );
-
+            print(customer);
             customers.add(customer);
           }
         }

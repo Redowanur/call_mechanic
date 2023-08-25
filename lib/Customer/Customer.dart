@@ -22,6 +22,8 @@ class CustomerUI extends State<Customer> {
 
   CustomerUI(this.id, this.name, this.phone);
 
+  // void init
+
   @override
   Widget build(BuildContext context) {
     bool darkTheme =

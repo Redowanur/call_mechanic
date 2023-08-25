@@ -50,53 +50,39 @@ class CustomerHomeUI extends State<CustomerHome> {
     fetchMechanicsData();
   }
 
-  // Future<void> deleteMechanicData(Mechanic mechanic) async {
-  //   try {
-  //     Position position = await _determinePosition();
-  //     // Step 1: Delete the customer data from the mechanic's table
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(mechanic.id) // mechanic's id
-  //         .update({
-  //       'requests': FieldValue.arrayRemove([
-  //         {
-  //           'name': name,
-  //           'phone': phone,
-  //           'latitude': position.latitude,
-  //           'longitude': position.longitude,
-  //           'status': mechanic.status,
-  //         }
-  //       ]),
-  //     });
+  Future<void> deleteMechanicData(String i) async {
+    // i mechanic id
+    // id customer id
+    try {
+      id = id + "0";
+      var clientCollection =
+          FirebaseFirestore.instance.collection("CustomerRequests");
+      clientCollection.doc(i).update({
+        "idArray": FieldValue.arrayRemove([id])
+      }).then((_) {
+        print("success!");
+      });
 
-  //     // Step 2: Delete the mechanic data from the customer's table
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(id) // customer's id
-  //         .update({
-  //       'requests': FieldValue.arrayRemove([
-  //         {
-  //           'id': mechanic.id, // mechanic's id
-  //           'name': mechanic.name,
-  //           'phone': mechanic.phone,
-  //           'latitude': mechanic.latitude,
-  //           'longitude': mechanic.longitude,
-  //           'status': mechanic.status,
-  //         }
-  //       ]),
-  //     });
+      i = i + "0";
+      var clientCollection2 =
+          FirebaseFirestore.instance.collection("MechanicRequests");
+      clientCollection2.doc(id).update({
+        "id1Array": FieldValue.arrayRemove([i])
+      }).then((_) {
+        print("success!");
+      });
 
-  //     // Update the local mechanics list
-  //     setState(() {
-  //       mechanics.remove(mechanic);
-  //     });
+      // Update the local mechanics list
+      setState(() {
+        // mechanics.remove(mechanic);
+      });
 
-  //     Fluttertoast.showToast(msg: 'Mechanic deleted successfully');
-  //   } catch (error) {
-  //     Fluttertoast.showToast(msg: 'Failed to delete mechanic');
-  //     print('Error: $error');
-  //   }
-  // }
+      Fluttertoast.showToast(msg: 'Mechanic deleted successfully');
+    } catch (error) {
+      Fluttertoast.showToast(msg: 'Failed to delete mechanic');
+      print('Error: $error');
+    }
+  }
 
   fetchMechanicsData() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
@@ -110,24 +96,38 @@ class CustomerHomeUI extends State<CustomerHome> {
       if (userData.containsKey('id1Array')) {
         dynamic arrayData = userData['id1Array'];
         if (arrayData is List<dynamic>) {
-          for (var i in arrayData) {
-            var mecha = await MechanicModel.fetchMechanicData(i);
+          for (String i in arrayData) {
+            String ii = i.substring(0, i.length - 1);
+            String status = i.substring(i.length - 1);
+            var mecha = await MechanicModel.fetchMechanicData(ii);
+
+            if (status == '0') {
+              status = 'Pending';
+            } else if (status == '1') {
+              status = 'Accepted';
+            }
 
             Mechanic mechanic = Mechanic(
-              id: id,
+              id: ii,
               name: mecha.name,
-              status: 'status',
+              status: status,
               phone: mecha.phone,
               latitude: mecha.latitude,
               longitude: mecha.longitude,
             );
-
+            // print('------------------------------------------------');
+            // print(ii);
+            // print(mecha.name);
+            // print(status);
+            // print(mecha.phone);
+            // print(mecha.latitude);
+            // print(mecha.longitude);
             mechanics.add(mechanic);
           }
         }
       }
 
-      setState(() {}); // Trigger a UI update after fetching data
+      // setState(() {}); // Trigger a UI update after fetching data
     } else {
       print('Document does not exist');
     }
@@ -245,7 +245,7 @@ class CustomerHomeUI extends State<CustomerHome> {
                                 actions: [
                                   TextButton(
                                       onPressed: () {
-                                        // deleteMechanicData(mechanic);
+                                        deleteMechanicData(mechanic.id);
                                         Navigator.of(context).pop();
                                         Fluttertoast.showToast(
                                             msg: "Canceled Request");

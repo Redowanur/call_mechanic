@@ -115,7 +115,7 @@ class ShowMapUI extends State<ShowMap> {
     }
 
     await customerReq.doc(id1).update({
-      'idArray': FieldValue.arrayUnion([id]),
+      'idArray': FieldValue.arrayUnion([id+'0']),
     });
     cntm++;
     await userDocRef.doc(id1).update({'totalRequests': cntm});
@@ -207,7 +207,7 @@ class ShowMapUI extends State<ShowMap> {
                           }
 
                           await mechanicReq.doc(id).update({
-                            'id1Array': FieldValue.arrayUnion([id1]),
+                            'id1Array': FieldValue.arrayUnion([id1+'0']),
                           });
                           cnt++;
                           await userDocRef

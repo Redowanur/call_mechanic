@@ -29,11 +29,11 @@ class MechanicModel {
       return MechanicModel(
         id: userData['id'],
         ionline: userData['isOnline'],
-        latitude: userData['latitude'],
-        longitude: userData['longitude'],
+        latitude: userData['latitude'].toDouble(),
+        longitude: userData['longitude'].toDouble(),
         name: userData['name'],
         phone: userData['phone'],
-        rating: userData['rating'],
+        rating: userData['rating']?.toDouble(),
       );
     } else {
       // If the document doesn't exist, throw an exception

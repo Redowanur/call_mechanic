@@ -1,4 +1,4 @@
-import 'package:call_mechanic/LoginScreen.dart';
+import 'package:call_mechanic/login_screen.dart';
 import 'package:call_mechanic/global/global.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +21,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         .sendPasswordResetEmail(email: emailtext.text.trim())
         .then((value) {
       Fluttertoast.showToast(msg: "Password Reset Link Sent");
+      // ignore: avoid_types_as_parameter_names
     }).onError((error, StackTrace) {
       Fluttertoast.showToast(msg: "Try again later");
     });
@@ -36,13 +37,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         },
         child: Scaffold(
           body: ListView(
-            padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+            padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
             children: [
               Column(
                 children: [
                   // Image.asset(
                   //     darkTheme ? "images/banner.png" : "images/spanner.png"),
-                  SizedBox(
+                  const SizedBox(
                     height: 50,
                   ),
                   Text(
@@ -64,7 +65,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 ),
                                 TextFormField(
@@ -73,7 +74,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   ],
                                   decoration: InputDecoration(
                                       hintText: "email",
-                                      hintStyle: TextStyle(
+                                      hintStyle: const TextStyle(
                                           color: Colors.grey,
                                           fontFamily: 'UberMove'),
                                       filled: true,
@@ -83,7 +84,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(40),
-                                          borderSide: BorderSide(
+                                          borderSide: const BorderSide(
                                               width: 0,
                                               style: BorderStyle.none)),
                                       prefixIcon: Icon(

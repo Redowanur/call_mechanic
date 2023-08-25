@@ -1,8 +1,8 @@
-import 'package:call_mechanic/Mechanic/MechanicProfile.dart';
+import '/Mechanic/mechanic_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'MechanicHome.dart';
+import 'mechanic_home.dart';
 
 // ignore: must_be_immutable
 class Mechanic extends StatefulWidget {

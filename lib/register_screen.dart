@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
-import 'ForgotPassword.dart';
-import 'LoginScreen.dart';
+import 'forgot_password.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -24,10 +24,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final passwordtext = TextEditingController();
   final confimtext = TextEditingController();
   String defrole = 'Select Role';
-  bool isOnline = false;
-  double latitude = 0, longitude = 0, rating = 0;
-  int reviews = 0;
-  List<Map<String, dynamic>> requests = [];
 
   bool _passwordvis = false;
 
@@ -54,9 +50,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'address': adresstext.text.trim(),
             'phone': phonetext.text.trim(),
             'role': defrole,
-            'latitude': latitude,
-            'longitude': longitude,
-            'requests': requests,
+            'latitude': 0.0,
+            'longitude': 0.0,
+            'totalRequests': 0,
           });
         } else if (defrole == 'Mechanic') {
           await userRef.doc(currentUser!.uid).set({
@@ -66,12 +62,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'address': adresstext.text.trim(),
             'phone': phonetext.text.trim(),
             'role': defrole,
-            'isOnline': isOnline,
-            'latitude': latitude,
-            'longitude': longitude,
-            'rating': rating,
-            'reviews': reviews,
-            'requests': requests,
+            'isOnline': false,
+            'latitude': 0.0,
+            'longitude': 0.0,
+            'rating': 0.0,
+            'reviews': 0,
+            'totalRequests': 0,
           });
         }
 
@@ -96,13 +92,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         },
         child: Scaffold(
           body: ListView(
-            padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+            padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
             children: [
               Column(
                 children: [
                   // Image.asset(
                   //     darkTheme ? "images/banner.png" : "images/spanner.png"),
-                  SizedBox(
+                  const SizedBox(
                     height: 40,
                   ),
                   Text(
@@ -130,7 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ],
                                   decoration: InputDecoration(
                                       hintText: "name",
-                                      hintStyle: TextStyle(
+                                      hintStyle: const TextStyle(
                                           color: Colors.grey,
                                           fontFamily: 'UberMove'),
                                       filled: true,
@@ -140,7 +136,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(40),
-                                          borderSide: BorderSide(
+                                          borderSide: const BorderSide(
                                               width: 0,
                                               style: BorderStyle.none)),
                                       prefixIcon: Icon(

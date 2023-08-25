@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:call_mechanic/ShowMap.dart';
+import 'package:call_mechanic/show_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../models/MechanicData.dart';
+import '../models/mechanic_data.dart';
 
+// ignore: must_be_immutable
 class CustomerHome extends StatefulWidget {
   String id, name, phone;
   // double latitude, longitude;

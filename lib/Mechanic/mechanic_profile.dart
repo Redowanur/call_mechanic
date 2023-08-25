@@ -1,10 +1,11 @@
-import 'package:call_mechanic/LoginScreen.dart';
+import 'package:call_mechanic/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+// ignore: must_be_immutable
 class MechanicProfile extends StatefulWidget {
   String id, name;
   bool isOnline;

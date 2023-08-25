@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../Navigation.dart';
-import '../models/CustomerData.dart';
-import '../models/MechanicData.dart';
+import '../navigation.dart';
+import '../models/customer_data.dart';
+import '../models/mechanic_data.dart';
 
+// ignore: must_be_immutable
 class MechanicHome extends StatefulWidget {
   String id;
 
@@ -229,12 +230,13 @@ class MechanicHomeUI extends State<MechanicHome> {
                             var mechanic =
                                 await MechanicModel.fetchMechanicData(
                                     widget.id);
+                            // ignore: use_build_context_synchronously
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Navigate2Customer(
-                                  mechanic.latitude ?? 0.0,
-                                  mechanic.longitude ?? 0.0,
+                                  mechanic.latitude,
+                                  mechanic.longitude,
                                   customer.latitude,
                                   customer.longitude,
                                 ),

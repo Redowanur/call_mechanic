@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../LoginScreen.dart';
+import '../login_screen.dart';
 
+// ignore: must_be_immutable
 class CustomerProfile extends StatefulWidget {
   String id, name;
 

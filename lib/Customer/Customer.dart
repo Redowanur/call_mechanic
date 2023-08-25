@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'CustomerHome.dart';
+import 'customer_home.dart';
 import 'package:flutter/services.dart';
-import 'CustomerProfile.dart';
+import 'customer_profile.dart';
 
+// ignore: must_be_immutable
 class Customer extends StatefulWidget {
   String id, name, phone;
   // double latitude, longitude;

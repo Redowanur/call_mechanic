@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -43,7 +44,6 @@ class MechanicHomeUI extends State<MechanicHome> {
 
   @override
   void initState() {
-    super.initState();
     id = widget.id;
     fetchCustomersData();
   }
@@ -80,7 +80,9 @@ class MechanicHomeUI extends State<MechanicHome> {
               longitude: cust.longitude,
             );
             print(customer);
-            customers.add(customer);
+            setState(() {
+              customers.add(customer);
+            });
           }
         }
       }
@@ -93,41 +95,21 @@ class MechanicHomeUI extends State<MechanicHome> {
 
   Future<void> deleteCustomerData(Customer customer) async {
     try {
-      // Position position = await _determinePosition();
-      // // Step 1: Delete the customer data from the mechanic's table
-      // await FirebaseFirestore.instance
-      //     .collection('users')
-      //     .doc(mechanic.id) // mechanic's id
-      //     .update({
-      //   'requests': FieldValue.arrayRemove([
-      //     {
-      //       'name': name,
-      //       'phone': phone,
-      //       'latitude': position.latitude,
-      //       'longitude': position.longitude,
-      //       'status': mechanic.status,
-      //     }
-      //   ]),
-      // });
-
+      await FirebaseFirestore.instance
+          .collection('MechanicRequests')
+          .doc(customer.id) // customer's id
+          .update({
+        'id1Array': FieldValue.arrayRemove([id + '1', id + '0']),
+      });
       // Step 2: Delete the mechanic data from the customer's table
       await FirebaseFirestore.instance
-          .collection('users')
+          .collection('CustomerRequests')
           .doc(id) // customer's id
           .update({
-        'requests': FieldValue.arrayRemove([
-          {
-            'id': customer.id, // mechanic's id
-            'name': customer.name,
-            'phone': customer.phone,
-            'latitude': customer.latitude,
-            'longitude': customer.longitude,
-            'status': customer.status,
-          }
-        ]),
+        'idArray':
+            FieldValue.arrayRemove([customer.id + '1', customer.id + '0']),
       });
 
-      // Update the local mechanics list
       setState(() {
         customers.remove(customer);
       });
@@ -135,6 +117,45 @@ class MechanicHomeUI extends State<MechanicHome> {
       Fluttertoast.showToast(msg: 'Mechanic deleted successfully');
     } catch (error) {
       Fluttertoast.showToast(msg: 'Failed to delete mechanic');
+      print('Error: $error');
+    }
+  }
+
+  Future<void> acceptRequest(String customerId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('CustomerRequests')
+          .doc(id)
+          .update({
+        'idArray': FieldValue.arrayRemove([customerId + '0']),
+      });
+
+      String temp = customerId + '1';
+      await FirebaseFirestore.instance
+          .collection('CustomerRequests')
+          .doc(id)
+          .update({
+        'idArray': FieldValue.arrayUnion([temp]),
+      });
+
+      await FirebaseFirestore.instance
+          .collection('MechanicRequests')
+          .doc(customerId)
+          .update({
+        'id1Array': FieldValue.arrayRemove([id + '0']),
+      });
+
+      temp = id + '1';
+      await FirebaseFirestore.instance
+          .collection('MechanicRequests')
+          .doc(customerId)
+          .update({
+        'id1Array': FieldValue.arrayUnion([temp]),
+      });
+
+      Fluttertoast.showToast(msg: 'Request accepted successfully');
+    } catch (error) {
+      Fluttertoast.showToast(msg: 'Failed to accept request');
       print('Error: $error');
     }
   }
@@ -155,6 +176,7 @@ class MechanicHomeUI extends State<MechanicHome> {
               actions: [
                 TextButton(
                     onPressed: () {
+                      acceptRequest(customer.id);
                       Navigator.of(context).pop();
                       Fluttertoast.showToast(msg: "Accepted Request");
                     },
@@ -223,7 +245,9 @@ class MechanicHomeUI extends State<MechanicHome> {
                   ),
                   child: ListTile(
                     onTap: () {
-                      myAlertDialog(context, customer);
+                      if (customer.status == 'Pending') {
+                        myAlertDialog(context, customer);
+                      } else if (customer.status == 'Accepted') {}
                     },
                     leading: CircleAvatar(child: Icon(Icons.person_sharp)),
                     title: Text(customer.name),

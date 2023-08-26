@@ -147,31 +147,26 @@ class MechanicProfileUI extends State<MechanicProfile> {
               Switch(
                 value: isOnline,
                 onChanged: (value) async {
-                  setState(() async {
+                  setState(() {
                     isOnline = value;
-                    if (isOnline) {
-                      Position position = await _determinePosition();
-                      await userDocRef.doc(id).update({
-                        'isOnline': true,
-                        'latitude': position.latitude,
-                        'longitude': position.longitude,
-                      });
-
-                      setState(() {});
-                    } else {
-                      await userDocRef.doc(id).update({
-                        'isOnline': false,
-                        'latitude': 0.0,
-                        'longitude': 0.0,
-                      });
-
-                      setState(() {});
-                    }
                   });
+
+                  if (isOnline) {
+                    Position position = await _determinePosition();
+                    await userDocRef.doc(id).update({
+                      'isOnline': true,
+                      'latitude': position.latitude,
+                      'longitude': position.longitude,
+                    });
+                  } else {
+                    await userDocRef.doc(id).update({
+                      'isOnline': false,
+                      'latitude': 0.0,
+                      'longitude': 0.0,
+                    });
+                  }
                 },
-                activeColor: darkTheme
-                    ? Colors.amber.shade300
-                    : Colors.blue, // Change the active color
+                activeColor: darkTheme ? Colors.amber.shade300 : Colors.blue,
               ),
             ],
           ),

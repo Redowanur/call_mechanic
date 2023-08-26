@@ -1,7 +1,10 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:call_mechanic/navigator_for_customer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:call_mechanic/show_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/mechanic_data.dart';
@@ -43,6 +46,24 @@ class CustomerHomeUI extends State<CustomerHome> {
 
   @override
   void initState() {
+    AwesomeNotifications().initialize(
+      'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.pinimg.com%2Foriginals%2F2b%2Ffb%2F10%2F2bfb109966e64e9d6884d811a0072029.jpg&f=1&nofb=1&ipt=984cc268343124711e260f7eb8da34138a828e4565b39a82cd13e2078ce8d317&ipo=images', // Replace with your app icon resource
+      [
+        NotificationChannel(
+          channelKey: 'Call Mechanic',
+          channelName: 'Mechanic Status',
+          channelDescription: 'Car Helper',
+          defaultColor: Color(0xFF9D50DD),
+          ledColor: Colors.white,
+        ),
+      ],
+    );
+    super.initState();
+    AwesomeNotifications().isNotificationAllowed().then((isallowed) {
+      if (!isallowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
     super.initState();
     id = widget.id;
     name = widget.name;
@@ -50,31 +71,25 @@ class CustomerHomeUI extends State<CustomerHome> {
     fetchMechanicsData();
   }
 
-  Future<void> deleteMechanicData(String i) async {
-    // i mechanic id
-    // id customer id
+  Future<void> deleteMechanicData(Mechanic mechanic) async {
     try {
-      id = id + "0";
-      var clientCollection =
-          FirebaseFirestore.instance.collection("CustomerRequests");
-      clientCollection.doc(i).update({
-        "idArray": FieldValue.arrayRemove([id])
-      }).then((_) {
-        print("success!");
+      await FirebaseFirestore.instance
+          .collection('MechanicRequests')
+          .doc(id) // customer's id
+          .update({
+        'id1Array':
+            FieldValue.arrayRemove([mechanic.id + '1', mechanic.id + '0']),
+      });
+      // Step 2: Delete the mechanic data from the customer's table
+      await FirebaseFirestore.instance
+          .collection('CustomerRequests')
+          .doc(mechanic.id) // customer's id
+          .update({
+        'idArray': FieldValue.arrayRemove([id + '1', id + '0']),
       });
 
-      i = i + "0";
-      var clientCollection2 =
-          FirebaseFirestore.instance.collection("MechanicRequests");
-      clientCollection2.doc(id).update({
-        "id1Array": FieldValue.arrayRemove([i])
-      }).then((_) {
-        print("success!");
-      });
-
-      // Update the local mechanics list
       setState(() {
-        // mechanics.remove(mechanic);
+        mechanics.remove(mechanic);
       });
 
       Fluttertoast.showToast(msg: 'Mechanic deleted successfully');
@@ -245,7 +260,7 @@ class CustomerHomeUI extends State<CustomerHome> {
                                 actions: [
                                   TextButton(
                                       onPressed: () {
-                                        deleteMechanicData(mechanic.id);
+                                        deleteMechanicData(mechanic);
                                         Navigator.of(context).pop();
                                         Fluttertoast.showToast(
                                             msg: "Canceled Request");
@@ -276,6 +291,19 @@ class CustomerHomeUI extends State<CustomerHome> {
                               );
                             },
                           );
+                        } else if (mechanic.status == 'Accepted') {
+                          // AwesomeNotifications().createNotification(
+                          //   content: NotificationContent(
+                          //     id: 0,
+                          //     channelKey: 'basic_channel',
+                          //     title: 'Mechanic Status Update',
+                          //     body: 'Your mechanic is on the way!',
+                          //   ),
+                          // );
+                          Fluttertoast.showToast(
+                              textColor: Colors.amber.shade400,
+                              fontSize: 34,
+                              msg: "Your Mechanic is on his way");
                         }
                       },
                       leading: CircleAvatar(child: Icon(Icons.person_sharp)),
@@ -287,12 +315,18 @@ class CustomerHomeUI extends State<CustomerHome> {
                         children: [
                           IconButton(
                             icon: Icon(Icons.location_pin),
-                            onPressed: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //       builder: (context) => ShowMap(id)),
-                              // );
+                            onPressed: () async {
+                              Position position = await _determinePosition();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ShowPolyline(
+                                          24.911851,
+                                          91.871593,
+                                          position.latitude,
+                                          position.longitude,
+                                        )),
+                              );
                             },
                           ),
                           IconButton(
@@ -325,32 +359,32 @@ class CustomerHomeUI extends State<CustomerHome> {
     );
   }
 
-  // Future<Position> _determinePosition() async {
-  //   bool serviceEnabled;
-  //   LocationPermission permission;
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
-  //   if (!serviceEnabled) {
-  //     return Future.error('Location services are disabled.');
-  //   }
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
 
-  //   permission = await Geolocator.checkPermission();
+    permission = await Geolocator.checkPermission();
 
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
 
-  //     if (permission == LocationPermission.denied) {
-  //       return Future.error('Location permission denied.');
-  //     }
-  //   }
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permission denied.');
+      }
+    }
 
-  //   if (permission == LocationPermission.deniedForever) {
-  //     return Future.error('Location permissions are permanently denied');
-  //   }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
 
-  //   Position position = await Geolocator.getCurrentPosition();
+    Position position = await Geolocator.getCurrentPosition();
 
-  //   return position;
-  // }
+    return position;
+  }
 }

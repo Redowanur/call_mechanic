@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'customer_home.dart';
 import 'package:flutter/services.dart';
 import 'customer_profile.dart';
@@ -22,7 +24,20 @@ class CustomerUI extends State<Customer> {
 
   CustomerUI(this.id, this.name, this.phone);
 
-  // void init
+  @override
+  void initState() {
+    super.initState();
+    getCurrentLocation();
+  }
+
+  getCurrentLocation() async {
+    Position position = await _determinePosition();
+    final userDocRef = FirebaseFirestore.instance.collection('users');
+    await userDocRef.doc(id).update({
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,5 +80,34 @@ class CustomerUI extends State<Customer> {
         ),
       ),
     );
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permission denied.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+
+    return position;
   }
 }

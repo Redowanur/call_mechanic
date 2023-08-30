@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
+import 'Admin/AdminPanel.dart';
 import 'Mechanic/mechanic.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -80,6 +81,12 @@ class _LoginScreenState extends State<LoginScreen> {
               MaterialPageRoute(
                   builder: (c) => Mechanic(id, name,
                       isOnline))); // replace with mechanic profile page
+        } else if (rolep == "Admin") {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (c) =>
+                      AdminPanel())); // replace with mechanic profile page
         }
       } catch (error) {
         Fluttertoast.showToast(msg: "Log In Failed");

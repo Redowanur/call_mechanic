@@ -1,5 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:call_mechanic/login_screen.dart';
+import 'package:call_mechanic/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: MyThemes.lighttheme,
       darkTheme: MyThemes.darktheme,
-      home: LoginScreen(),
+      home: HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -58,6 +58,7 @@ dependencies:
   custom_info_window: ^1.0.1
   liquid_pull_to_refresh: ^3.0.1
   awesome_notifications: ^0.7.4+1
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:

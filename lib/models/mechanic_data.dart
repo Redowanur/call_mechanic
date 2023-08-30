@@ -7,7 +7,8 @@ class MechanicModel {
   double longitude;
   String name;
   String phone;
-  double? rating;
+  double rating;
+  int reviews;
 
   MechanicModel({
     this.id,
@@ -16,7 +17,8 @@ class MechanicModel {
     required this.longitude,
     required this.name,
     required this.phone,
-    this.rating,
+    required this.rating,
+    required this.reviews,
   });
 
   static Future<MechanicModel> fetchMechanicData(String id) async {
@@ -34,6 +36,7 @@ class MechanicModel {
         name: userData['name'],
         phone: userData['phone'],
         rating: userData['rating']?.toDouble(),
+        reviews: userData['reviews'],
       );
     } else {
       // If the document doesn't exist, throw an exception

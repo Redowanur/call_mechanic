@@ -3,6 +3,7 @@ import 'package:call_mechanic/navigator_for_customer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:call_mechanic/show_map.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,23 +27,30 @@ class Mechanic {
   final String name;
   final String status;
   final String phone;
-  final double latitude, longitude;
+  final double latitude, longitude, rating;
+  final int reviews;
 
-  Mechanic(
-      {required this.id,
-      required this.name,
-      required this.status,
-      required this.phone,
-      required this.latitude,
-      required this.longitude});
+  Mechanic({
+    required this.id,
+    required this.name,
+    required this.status,
+    required this.phone,
+    required this.latitude,
+    required this.longitude,
+    required this.rating,
+    required this.reviews,
+  });
 }
 
 class CustomerHomeUI extends State<CustomerHome> {
   String id, name, phone;
+  bool isChecked = false;
   // double latitude, longitude;
   bool shouldRefresh = false;
   List<Mechanic> mechanics = [];
   CustomerHomeUI(this.id, this.name, this.phone);
+
+  final userDocRef = FirebaseFirestore.instance.collection('users');
 
   @override
   void initState() {
@@ -129,6 +137,8 @@ class CustomerHomeUI extends State<CustomerHome> {
               phone: mecha.phone,
               latitude: mecha.latitude,
               longitude: mecha.longitude,
+              rating: mecha.rating,
+              reviews: mecha.reviews,
             );
             // print('------------------------------------------------');
             // print(ii);
@@ -152,6 +162,80 @@ class CustomerHomeUI extends State<CustomerHome> {
   Widget build(BuildContext context) {
     bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    displayBottomSheet(
+        BuildContext context, String mechanicId, int review, double curRating) {
+      double rating = 0.0; // Default rating value
+
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: darkTheme
+            ? const Color.fromARGB(255, 93, 92, 92)
+            : Color.fromARGB(255, 220, 220, 220),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        builder: (context) => Container(
+          padding: EdgeInsets.all(20),
+          height: 300,
+          child: ListView(
+            children: [
+              SizedBox(height: 20),
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'Thanks for using our service.',
+                      style: TextStyle(fontSize: 17),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Would you like to rate the Mechanic?',
+                      style: TextStyle(fontSize: 17),
+                    ),
+                    SizedBox(height: 20),
+                    RatingBar.builder(
+                      initialRating: rating,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemSize: 30,
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      onRatingUpdate: (newRating) {
+                        setState(() {
+                          rating = newRating;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        rating = ((curRating * review) + rating) / (review + 1);
+                        review++;
+                        await userDocRef.doc(mechanicId).update({
+                          'rating': double.parse(rating.toStringAsFixed(1)),
+                          'reviews': review,
+                        });
+                        Navigator.of(context).pop(); // Close the bottom sheet
+                      },
+                      child: Text('Submit Rating'),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              darkTheme ? Colors.amber.shade400 : Colors.blue),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(0),
@@ -300,10 +384,8 @@ class CustomerHomeUI extends State<CustomerHome> {
                           //     body: 'Your mechanic is on the way!',
                           //   ),
                           // );
-                          Fluttertoast.showToast(
-                              textColor: Colors.amber.shade400,
-                              fontSize: 34,
-                              msg: "Your Mechanic is on his way");
+                          displayBottomSheet(context, mechanic.id,
+                              mechanic.reviews, mechanic.rating);
                         }
                       },
                       leading: CircleAvatar(child: Icon(Icons.person_sharp)),
